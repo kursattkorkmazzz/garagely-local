@@ -1,0 +1,85 @@
+{
+  "addVehicle": "Add Vehicle",
+  "editVehicle": "Edit Vehicle",
+  "addToFleet": "Add to Fleet",
+  "updateVehicle": "Update Vehicle",
+  "image": {
+    "title": "Add Vehicle Image",
+    "description": "Upload a clear photo of your car"
+  },
+  "general": {
+    "title": "General",
+    "brand": "Brand",
+    "brandPlaceholder": "e.g. Tesla",
+    "model": "Model",
+    "modelPlaceholder": "e.g. Model 3",
+    "color": "Color",
+    "colorPlaceholder": "e.g. Red"
+  },
+  "identification": {
+    "title": "Identification",
+    "year": "Year",
+    "yearPlaceholder": "2024",
+    "plate": "Plate Number",
+    "platePlaceholder": "ABC-1234",
+    "vin": "VIN",
+    "vinPlaceholder": "17 characters"
+  },
+  "technical": {
+    "title": "Technical",
+    "fuelType": "Fuel Type",
+    "transmissionType": "Transmission",
+    "bodyType": "Body Type",
+    "selectPlaceholder": "Select..."
+  },
+  "fuelTypes": {
+    "gasoline": "Gasoline",
+    "diesel": "Diesel",
+    "electric": "Electric",
+    "hybrid": "Hybrid",
+    "lpg": "LPG"
+  },
+  "transmissionTypes": {
+    "manual": "Manual",
+    "automatic": "Automatic",
+    "cvt": "CVT"
+  },
+  "bodyTypes": {
+    "sedan": "Sedan",
+    "hatchback": "Hatchback",
+    "suv": "SUV",
+    "coupe": "Coupe",
+    "pickup": "Pickup",
+    "van": "Van",
+    "wagon": "Wagon",
+    "convertible": "Convertible"
+  },
+  "purchase": {
+    "title": "Purchase Info",
+    "date": "Purchase Date",
+    "datePlaceholder": "Select date",
+    "price": "Purchase Price",
+    "pricePlaceholder": "e.g. 50000",
+    "distance": "Odometer at Purchase",
+    "distancePlaceholder": "e.g. 15000"
+  },
+  "errors": {
+    "brand": {
+      "REQUIRED": "Brand is required"
+    },
+    "model": {
+      "REQUIRED": "Model is required"
+    },
+    "year": {
+      "REQUIRED": "Year is required",
+      "NUMBER_MIN": "Year must be greater than 1886",
+      "NUMBER_MAX": "Year must be less than or equal to the next year"
+    },
+    "plate": {
+      "REQUIRED": "Plate number is required"
+    },
+    "vin": {
+      "LENGTH": "VIN must be 17 characters"
+    }
+  }
+}

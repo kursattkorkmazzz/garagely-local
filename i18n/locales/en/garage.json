@@ -1,0 +1,20 @@
+{
+  "label": "Garage",
+  "hero": {
+    "description": "Manage your vehicle features and performance"
+  },
+  "vehicles": {
+    "label": "Vehicles",
+    "description": "Manage all your own vehicles.",
+    "items": {
+      "vehicles": {
+        "label": "Vehicles",
+        "description": "View and manage all your cars."
+      }
+    }
+  },
+  "emptyState": {
+    "title": "No Vehicles Yet",
+    "description": "Add your first vehicle to start tracking expenses"
+  }
+}

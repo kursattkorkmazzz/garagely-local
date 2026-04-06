@@ -1,0 +1,19 @@
+{
+  "buttons": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "done": "Done"
+  },
+  "imagePicker": {
+    "camera": "Take Photo",
+    "library": "Choose from Library",
+    "remove": "Remove Photo"
+  },
+  "permissions": {
+    "cameraDenied": "Camera permission is required to take photos",
+    "libraryDenied": "Photo library permission is required to select photos"
+  }
+}

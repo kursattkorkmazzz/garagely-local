@@ -1,0 +1,22 @@
+{
+  "label": "Settings",
+  "sections": {
+    "preferences": "Preferences",
+    "information": "Information"
+  },
+  "menu": {
+    "theme": "Theme",
+    "language": "Language",
+    "currency": "Currency",
+    "distanceUnit": "Distance Unit",
+    "volumeUnit": "Volume Unit"
+  },
+  "actions": {
+    "selectTheme": "Select Theme",
+    "selectLanguage": "Select Language",
+    "selectCurrency": "Select Currency",
+    "selectDistance": "Select Distance Unit",
+    "selectVolume": "Select Volume Unit"
+  },
+  "version": "Version {{version}}"
+}

@@ -1,0 +1,19 @@
+{
+  "buttons": {
+    "cancel": "Vazgec",
+    "confirm": "Onayla",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Duzenle",
+    "done": "Tamam"
+  },
+  "imagePicker": {
+    "camera": "Fotograf Cek",
+    "library": "Galeriden Sec",
+    "remove": "Fotografi Kaldir"
+  },
+  "permissions": {
+    "cameraDenied": "Fotograf cekmek icin kamera izni gerekli",
+    "libraryDenied": "Fotograf secmek icin galeri izni gerekli"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "label": "Ayarlar",
+  "sections": {
+    "preferences": "Tercihler",
+    "information": "Bilgi"
+  },
+  "menu": {
+    "theme": "Tema",
+    "language": "Dil",
+    "currency": "Para Birimi",
+    "distanceUnit": "Mesafe Birimi",
+    "volumeUnit": "Hacim Birimi"
+  },
+  "actions": {
+    "selectTheme": "Tema Seç",
+    "selectLanguage": "Dil Seç",
+    "selectCurrency": "Para Birimi Seç",
+    "selectDistance": "Mesafe Birimi Seç",
+    "selectVolume": "Hacim Birimi Seç"
+  },
+  "version": "Sürüm {{version}}"
+}

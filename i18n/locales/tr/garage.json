@@ -1,0 +1,20 @@
+{
+  "label": "Garaj",
+  "hero": {
+    "description": "Aracınızın özelliklerini ve performansını yönetin"
+  },
+  "vehicles": {
+    "label": "Araçlar",
+    "description": "Sahip olduğunuz araçlarınızı yönetin",
+    "items": {
+      "vehicles": {
+        "label": "Araçlar",
+        "description": "Araçlarınızı yönetin yada görüntüleyin"
+      }
+    }
+  },
+  "emptyState": {
+    "title": "Henüz Araç Yok",
+    "description": "Gider takibine başlamak için ilk aracınızı ekleyin"
+  }
+}

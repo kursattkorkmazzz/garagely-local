@@ -1,0 +1,85 @@
+{
+  "addVehicle": "Arac Ekle",
+  "editVehicle": "Araci Duzenle",
+  "addToFleet": "Filoya Ekle",
+  "updateVehicle": "Araci Guncelle",
+  "image": {
+    "title": "Arac Gorseli Ekle",
+    "description": "Aracinizin net bir fotografini yukleyin"
+  },
+  "general": {
+    "title": "Genel",
+    "brand": "Marka",
+    "brandPlaceholder": "orn. Tesla",
+    "model": "Model",
+    "modelPlaceholder": "orn. Model 3",
+    "color": "Renk",
+    "colorPlaceholder": "orn. Kirmizi"
+  },
+  "identification": {
+    "title": "Kimlik",
+    "year": "Yil",
+    "yearPlaceholder": "2024",
+    "plate": "Plaka",
+    "platePlaceholder": "34 ABC 123",
+    "vin": "Sasi No",
+    "vinPlaceholder": "17 karakter"
+  },
+  "technical": {
+    "title": "Teknik",
+    "fuelType": "Yakit Tipi",
+    "transmissionType": "Vites",
+    "bodyType": "Kasa Tipi",
+    "selectPlaceholder": "Secin..."
+  },
+  "fuelTypes": {
+    "gasoline": "Benzin",
+    "diesel": "Dizel",
+    "electric": "Elektrik",
+    "hybrid": "Hibrit",
+    "lpg": "LPG"
+  },
+  "transmissionTypes": {
+    "manual": "Manuel",
+    "automatic": "Otomatik",
+    "cvt": "CVT"
+  },
+  "bodyTypes": {
+    "sedan": "Sedan",
+    "hatchback": "Hatchback",
+    "suv": "SUV",
+    "coupe": "Coupe",
+    "pickup": "Pickup",
+    "van": "Van",
+    "wagon": "Station Wagon",
+    "convertible": "Cabrio"
+  },
+  "purchase": {
+    "title": "Satin Alma Bilgileri",
+    "date": "Satin Alma Tarihi",
+    "datePlaceholder": "Tarih secin",
+    "price": "Satin Alma Fiyati",
+    "pricePlaceholder": "orn. 500000",
+    "distance": "Satin Almadaki Kilometre",
+    "distancePlaceholder": "orn. 15000"
+  },
+  "errors": {
+    "brand": {
+      "REQUIRED": "Marka zorunludur"
+    },
+    "model": {
+      "REQUIRED": "Model zorunludur"
+    },
+    "year": {
+      "REQUIRED": "Yıl zorunludur",
+      "NUMBER_MIN": "Yıl 1886'dan küçük olamaz",
+      "NUMBER_MAX": "Yıl bir günümüzden bir sonraki yıldan büyük olamaz"
+    },
+    "plate": {
+      "REQUIRED": "Plaka numarası zorunludur"
+    },
+    "vin": {
+      "LENGTH": "Şasi no 17 karakter olmalıdır"
+    }
+  }
+}
