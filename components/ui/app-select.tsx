@@ -1,21 +1,17 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import { useTheme } from "@/theme/theme-context";
+import { radius } from "@/theme/tokens/radius";
+import { spacing } from "@/theme/tokens/spacing";
+import { Check, ChevronDown } from "lucide-react-native";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 import {
-  View,
-  Pressable,
   Modal,
-  StyleSheet,
+  Pressable,
   ScrollView,
+  StyleSheet,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { ChevronDown, Check } from "lucide-react-native";
 import { AppText } from "./app-text";
-import { useTheme } from "@/theme";
-import { radius, spacing } from "@/theme";
 
 // Context for sharing select state
 interface SelectContextProps {
@@ -192,9 +188,7 @@ export function AppSelectGroup({ children, label }: AppSelectGroupProps) {
   return (
     <View style={styles.group}>
       {label && (
-        <AppText
-          style={[styles.groupLabel, { color: theme.mutedForeground }]}
-        >
+        <AppText style={[styles.groupLabel, { color: theme.mutedForeground }]}>
           {label}
         </AppText>
       )}

@@ -1,5 +1,7 @@
 import { useI18n } from "@/hooks/use-i18n";
-import { radius, spacing, useTheme } from "@/theme";
+import { useTheme } from "@/theme/theme-context";
+import { radius } from "@/theme/tokens/radius";
+import { spacing } from "@/theme/tokens/spacing";
 import React from "react";
 import {
   Dimensions,

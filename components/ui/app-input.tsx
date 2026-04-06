@@ -1,13 +1,14 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { useTheme } from "@/theme/theme-context";
+import { radius } from "@/theme/tokens/radius";
+import { spacing } from "@/theme/tokens/spacing";
+import React, { createContext, ReactNode, useContext } from "react";
 import {
-  View,
+  StyleSheet,
   TextInput,
   TextInputProps,
-  StyleSheet,
+  View,
   ViewProps,
 } from "react-native";
-import { useTheme } from "@/theme";
-import { radius, spacing } from "@/theme";
 import { AppText } from "./app-text";
 import { AppView } from "./app-view";
 

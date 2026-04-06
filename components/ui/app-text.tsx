@@ -1,7 +1,8 @@
-import { useTheme } from "@/theme";
-import { typography, Typography, ThemeColors } from "@/theme";
-import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
+import { useTheme } from "@/theme/theme-context";
+import { ThemeColors } from "@/theme/tokens/colors";
+import { typography, Typography } from "@/theme/tokens/typography";
 import { useMemo } from "react";
+import { StyleSheet, Text, TextProps, TextStyle } from "react-native";
 
 type ColorVariant =
   | "default"

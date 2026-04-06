@@ -1,6 +1,6 @@
-import * as icons from "lucide-react-native";
+import { useTheme } from "@/theme/theme-context";
 import type { LucideIcon, LucideProps } from "lucide-react-native";
-import { useTheme } from "@/theme";
+import * as icons from "lucide-react-native";
 
 type IconName = keyof typeof icons;
 

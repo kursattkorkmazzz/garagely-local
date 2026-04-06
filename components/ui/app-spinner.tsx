@@ -1,14 +1,14 @@
+import { useTheme } from "@/theme/theme-context";
+import { Loader2 } from "lucide-react-native";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
-  useSharedValue,
+  Easing,
   useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withTiming,
-  Easing,
 } from "react-native-reanimated";
-import { Loader2 } from "lucide-react-native";
-import { useTheme } from "@/theme";
 
 type SpinnerSize = "sm" | "default" | "lg";
 
@@ -34,7 +34,7 @@ export function AppSpinner({ size = "default", color }: AppSpinnerProps) {
         easing: Easing.linear,
       }),
       -1,
-      false
+      false,
     );
   }, [rotation]);
 
