@@ -1,6 +1,6 @@
-import { View, StyleSheet } from "react-native";
+import { spacing } from "@/theme/tokens/spacing";
+import { StyleSheet, View } from "react-native";
 import { AppText } from "../../app-text";
-import { spacing } from "@/theme";
 
 type ListItemContentProps = {
   /** Main title */

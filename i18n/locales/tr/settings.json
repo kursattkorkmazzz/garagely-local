@@ -2,21 +2,25 @@
   "label": "Ayarlar",
   "sections": {
     "preferences": "Tercihler",
+    "preferencesDescription": "Uygulama görünümü ve davranışını özelleştirin",
     "information": "Bilgi"
   },
-  "menu": {
+  "preferencesMenu": {
     "theme": "Tema",
     "language": "Dil",
     "currency": "Para Birimi",
     "distanceUnit": "Mesafe Birimi",
-    "volumeUnit": "Hacim Birimi"
+    "volumeUnit": "Hacim Birimi",
+    "timezone": "Saat Dilimi"
   },
   "actions": {
     "selectTheme": "Tema Seç",
     "selectLanguage": "Dil Seç",
     "selectCurrency": "Para Birimi Seç",
     "selectDistance": "Mesafe Birimi Seç",
-    "selectVolume": "Hacim Birimi Seç"
+    "selectVolume": "Hacim Birimi Seç",
+    "selectTimezone": "Saat Dilimi Seç",
+    "searchTimezone": "Saat dilimi ara..."
   },
   "version": "Sürüm {{version}}"
 }

@@ -1,6 +1,8 @@
+import { useTheme } from "@/theme/theme-context";
+import { radius } from "@/theme/tokens/radius";
+import { spacing } from "@/theme/tokens/spacing";
 import { ReactNode } from "react";
-import { Pressable, View, StyleSheet, ViewStyle } from "react-native";
-import { useTheme, spacing, radius } from "@/theme";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
 type AppListItemProps = {
   /** Left slot content (icon, avatar, checkbox, etc.) */

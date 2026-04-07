@@ -24,6 +24,7 @@ export default function DashboardLayout() {
           elevation: 0,
         },
         tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.muted,
       }}
     >
       <Tabs.Screen
@@ -32,6 +33,15 @@ export default function DashboardLayout() {
           title: "Garage",
           tabBarIcon: (props) => (
             <AppIcon icon="Car" size={props.size} color={props.color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings/index"
+        options={{
+          title: "Settings",
+          tabBarIcon: (props) => (
+            <AppIcon icon="Settings" size={props.size} color={props.color} />
           ),
         }}
       />

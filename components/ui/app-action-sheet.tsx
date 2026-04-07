@@ -2,12 +2,13 @@ import { useI18n } from "@/hooks/use-i18n";
 import { useTheme } from "@/theme/theme-context";
 import { radius } from "@/theme/tokens/radius";
 import { spacing } from "@/theme/tokens/spacing";
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Dimensions,
   FlatList,
   Modal,
   StyleSheet,
+  TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -17,6 +18,10 @@ import { AppText } from "./app-text";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const MAX_OPTIONS_HEIGHT = SCREEN_HEIGHT * 0.5;
+export type ActionSheetRef = {
+  show: () => void;
+  close: () => void;
+};
 
 export type ActionSheetOption = {
   label: string;
@@ -31,6 +36,8 @@ type AppActionSheetProps = {
   message?: string;
   options: ActionSheetOption[];
   cancelLabel?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 };
 
 export function AppActionSheet({
@@ -40,19 +47,36 @@ export function AppActionSheet({
   message,
   options,
   cancelLabel,
+  searchable = false,
+  searchPlaceholder,
 }: AppActionSheetProps) {
   const { theme, withOpacity } = useTheme();
   const { t } = useI18n();
   const insets = useSafeAreaInsets();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const _cancelLabel = cancelLabel || t("buttons.cancel");
 
+  const filteredOptions = useMemo(() => {
+    if (!searchable || !searchQuery.trim()) {
+      return options;
+    }
+    return options.filter((opt) =>
+      opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchable, searchQuery, options]);
+
   const handleOptionPress = (option: ActionSheetOption) => {
-    onClose();
+    handleClose();
     // Small delay to allow modal to close before action
     setTimeout(() => {
       option.onPress();
     }, 100);
+  };
+
+  const handleClose = () => {
+    setSearchQuery("");
+    onClose();
   };
 
   return (
@@ -60,9 +84,9 @@ export function AppActionSheet({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback onPress={handleClose}>
         <View
           style={[
             styles.overlay,
@@ -100,13 +124,47 @@ export function AppActionSheet({
                   </View>
                 )}
 
+                {/* Search Input */}
+                {searchable && (
+                  <View
+                    style={[
+                      styles.searchContainer,
+                      { borderBottomColor: theme.border },
+                    ]}
+                  >
+                    <TextInput
+                      placeholder={searchPlaceholder || t("common.search")}
+                      placeholderTextColor={theme.muted}
+                      value={searchQuery}
+                      onChangeText={setSearchQuery}
+                      style={[
+                        styles.searchInput,
+                        {
+                          color: theme.foreground,
+                          backgroundColor: theme.background,
+                        },
+                      ]}
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                    />
+                  </View>
+                )}
+
                 {/* Options */}
                 <FlatList
-                  data={options}
+                  data={filteredOptions}
                   keyExtractor={(item, index) => `${item.label}-${index}`}
                   style={{ maxHeight: MAX_OPTIONS_HEIGHT }}
                   showsVerticalScrollIndicator={true}
                   bounces={false}
+                  getItemLayout={(_, index) => ({
+                    length: 50,
+                    offset: 50 * index,
+                    index,
+                  })}
+                  initialNumToRender={15}
+                  maxToRenderPerBatch={10}
+                  windowSize={5}
                   ItemSeparatorComponent={() => (
                     <View
                       style={{ height: 1, backgroundColor: theme.border }}
@@ -137,7 +195,7 @@ export function AppActionSheet({
               {/* Cancel Button */}
               <AppButton
                 variant="ghost"
-                onPress={onClose}
+                onPress={handleClose}
                 style={[
                   styles.cancelButton,
                   {
@@ -184,6 +242,17 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: "600",
     marginBottom: spacing.xs,
+  },
+  searchContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+  },
+  searchInput: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    fontSize: 16,
   },
   option: {
     borderRadius: 0,

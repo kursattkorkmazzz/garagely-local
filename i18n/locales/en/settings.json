@@ -2,21 +2,25 @@
   "label": "Settings",
   "sections": {
     "preferences": "Preferences",
+    "preferencesDescription": "Customize the app's appearance and behavior",
     "information": "Information"
   },
-  "menu": {
+  "preferencesMenu": {
     "theme": "Theme",
     "language": "Language",
     "currency": "Currency",
     "distanceUnit": "Distance Unit",
-    "volumeUnit": "Volume Unit"
+    "volumeUnit": "Volume Unit",
+    "timezone": "Timezone"
   },
   "actions": {
     "selectTheme": "Select Theme",
     "selectLanguage": "Select Language",
     "selectCurrency": "Select Currency",
     "selectDistance": "Select Distance Unit",
-    "selectVolume": "Select Volume Unit"
+    "selectVolume": "Select Volume Unit",
+    "selectTimezone": "Select Timezone",
+    "searchTimezone": "Search timezone..."
   },
   "version": "Version {{version}}"
 }

@@ -32,6 +32,7 @@ export interface UserPreferencesSlice {
   setCurrency: (currency: Currency) => Promise<void>;
   setVolume: (volume: VolumeUnit) => Promise<void>;
   setDistance: (distance: DistanceUnit) => Promise<void>;
+  setTimezone: (timezone: Timezone) => Promise<void>;
 }
 
 type SetPreferencesState = (partial: Partial<UserPreferencesSlice>) => void;
@@ -95,5 +96,10 @@ export const createUserPreferencesSlice = (
   setVolume: async (volume) => {
     set({ volume });
     UserPreferencesService.upsertVolumeUnit(volume);
+  },
+
+  setTimezone: async (timezone) => {
+    set({ timezone });
+    UserPreferencesService.upsertTimezone(timezone);
   },
 });

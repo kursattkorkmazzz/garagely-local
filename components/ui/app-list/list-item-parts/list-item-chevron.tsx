@@ -1,5 +1,5 @@
+import { useTheme } from "@/theme/theme-context";
 import { AppIcon } from "../../app-icon";
-import { useTheme } from "@/theme";
 
 type ListItemChevronProps = {
   /** Chevron color (defaults to theme.mutedForeground) */

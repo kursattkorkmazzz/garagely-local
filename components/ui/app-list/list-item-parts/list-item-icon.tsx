@@ -1,6 +1,7 @@
-import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/theme/theme-context";
+import { radius } from "@/theme/tokens/radius";
+import { StyleSheet, View } from "react-native";
 import { AppIcon, type IconName } from "../../app-icon";
-import { useTheme, radius } from "@/theme";
 
 type ListItemIconProps = {
   /** Icon name from Lucide */

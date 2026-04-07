@@ -1,6 +1,7 @@
-import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/theme/theme-context";
+import { spacing } from "@/theme/tokens/spacing";
+import { StyleSheet, View } from "react-native";
 import { AppText } from "../app-text";
-import { useTheme, spacing } from "@/theme";
 
 type AppListGroupProps = {
   /** Section label (displayed uppercase) */
