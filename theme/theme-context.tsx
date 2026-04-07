@@ -1,5 +1,5 @@
-import { ThemeTypes, type ThemeType } from "@/constants";
-import { useStore } from "@/store";
+import { ThemeTypes, type ThemeType } from "@/constants/theme";
+import { useStore } from "@/store/store";
 import React, {
   createContext,
   ReactNode,

@@ -1,0 +1,249 @@
+import { AppSkeleton } from "@/components/ui/app-skeleton";
+import { useTheme } from "@/theme/theme-context";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { Image, ImageSourcePropType, StyleSheet, View } from "react-native";
+import { AppText } from "./app-text";
+
+type AvatarSize = "sm" | "default" | "lg" | "xl" | "2xl";
+
+const sizeValues: Record<AvatarSize, number> = {
+  sm: 32,
+  default: 40,
+  lg: 56,
+  xl: 80,
+  "2xl": 100,
+};
+
+const fontSizes: Record<AvatarSize, number> = {
+  sm: 12,
+  default: 14,
+  lg: 20,
+  xl: 28,
+  "2xl": 36,
+};
+
+const badgeSizes: Record<AvatarSize, number> = {
+  sm: 12,
+  default: 16,
+  lg: 20,
+  xl: 24,
+  "2xl": 28,
+};
+
+// Context for sharing avatar state
+type ImageStatus = "idle" | "loading" | "loaded" | "error";
+
+interface AvatarContextProps {
+  size: AvatarSize;
+  imageStatus: ImageStatus;
+  setImageStatus: (status: ImageStatus) => void;
+}
+
+const AvatarContext = createContext<AvatarContextProps | null>(null);
+
+function useAvatarContext() {
+  const context = useContext(AvatarContext);
+  if (!context) {
+    throw new Error("Avatar components must be used within an AppAvatar");
+  }
+  return context;
+}
+
+// AppAvatar - Container component
+type AppAvatarProps = {
+  children: ReactNode;
+  size?: AvatarSize;
+};
+
+export function AppAvatar({ children, size = "default" }: AppAvatarProps) {
+  const [imageStatus, setImageStatus] = useState<ImageStatus>("idle");
+  const avatarSize = sizeValues[size];
+
+  return (
+    <AvatarContext.Provider value={{ size, imageStatus, setImageStatus }}>
+      <View
+        style={[styles.container, { width: avatarSize, height: avatarSize }]}
+      >
+        {children}
+      </View>
+    </AvatarContext.Provider>
+  );
+}
+
+// AppAvatarImage - The image component
+type AppAvatarImageProps = {
+  src: ImageSourcePropType | string;
+  alt?: string;
+};
+
+export function AppAvatarImage({ src, alt }: AppAvatarImageProps) {
+  const { size, imageStatus, setImageStatus } = useAvatarContext();
+  const avatarSize = sizeValues[size];
+
+  // Reset to loading state when src changes
+  const srcKey = typeof src === "string" ? src : "local";
+  useEffect(() => {
+    setImageStatus("loading");
+  }, [srcKey, setImageStatus]);
+
+  // Don't render image if src is empty or invalid
+  const isValidSrc =
+    typeof src === "string" ? src.trim().length > 0 : src != null;
+
+  if (!isValidSrc) {
+    return null;
+  }
+
+  const imageSource = typeof src === "string" ? { uri: src } : src;
+  const isLoaded = imageStatus === "loaded";
+
+  return (
+    <Image
+      key={srcKey}
+      source={imageSource}
+      accessibilityLabel={alt}
+      style={[
+        styles.image,
+        {
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+          opacity: isLoaded ? 1 : 0,
+          position: isLoaded ? "relative" : "absolute",
+        },
+      ]}
+      onLoad={() => setImageStatus("loaded")}
+      onError={() => setImageStatus("error")}
+    />
+  );
+}
+
+// AppAvatarFallback - Fallback when image is not loaded
+type AppAvatarFallbackProps = {
+  fallbackText?: string | null;
+  fallbackColor?: string;
+};
+
+function getInitials(text: string): string {
+  return text
+    .split(" ")
+    .filter((word) => word.length > 0)
+    .map((word) => word[0].toUpperCase())
+    .slice(0, 2)
+    .join("");
+}
+
+export function AppAvatarFallback({
+  fallbackText,
+  fallbackColor,
+}: AppAvatarFallbackProps) {
+  const { theme } = useTheme();
+  const { size, imageStatus } = useAvatarContext();
+  const avatarSize = sizeValues[size];
+  const fontSize = fontSizes[size];
+
+  // Don't render anything if image loaded successfully
+  if (imageStatus === "loaded") {
+    return null;
+  }
+
+  // Show skeleton while loading
+  if (imageStatus === "loading") {
+    return (
+      <AppSkeleton
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+        }}
+      />
+    );
+  }
+
+  // Show fallback on idle or error
+  const initials = fallbackText ? getInitials(fallbackText) : "?";
+  const backgroundColor = fallbackColor ?? theme.muted;
+
+  return (
+    <View
+      style={[
+        styles.fallback,
+        {
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+          backgroundColor,
+        },
+      ]}
+    >
+      <AppText
+        style={{
+          fontSize,
+          fontWeight: "600",
+          color: theme.foreground,
+        }}
+      >
+        {initials}
+      </AppText>
+    </View>
+  );
+}
+
+// AppAvatarBadge - Badge at bottom right
+type AppAvatarBadgeProps = {
+  children: ReactNode;
+  backgroundColor?: string;
+};
+
+export function AppAvatarBadge({
+  children,
+  backgroundColor,
+}: AppAvatarBadgeProps) {
+  const { theme } = useTheme();
+  const { size } = useAvatarContext();
+  const badgeSize = badgeSizes[size];
+
+  return (
+    <View
+      style={[
+        styles.badge,
+        {
+          width: badgeSize,
+          height: badgeSize,
+          borderRadius: badgeSize / 2,
+          backgroundColor: backgroundColor ?? theme.primary,
+          borderColor: theme.background,
+        },
+      ]}
+    >
+      {children}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    position: "relative",
+  },
+  image: {
+    resizeMode: "cover",
+  },
+  fallback: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badge: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+  },
+});
