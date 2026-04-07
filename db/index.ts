@@ -1,1 +1,1 @@
-export { getDatabase, initDatabase, closeDatabase } from "./database";
+export { getGaragelyDatabase, initializeGaragelyDatabase } from "./database";

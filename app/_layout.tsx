@@ -1,4 +1,5 @@
 import { AppLaunchingComponent } from "@/components/app-start/app-launching-component";
+import { initializeGaragelyDatabase } from "@/db";
 import { initI18n } from "@/i18n";
 import { useStore } from "@/store/store";
 import { ThemeProvider, useTheme } from "@/theme/theme-context";
@@ -8,6 +9,9 @@ import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import "reflect-metadata";
+
+initializeGaragelyDatabase();
 
 function RootLayoutNav() {
   const { theme, themeName } = useTheme();

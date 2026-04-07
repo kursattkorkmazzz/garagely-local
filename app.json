@@ -27,7 +27,25 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-sqlite", //TODO: Look at the sqlize configuration for better performance and security
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            // Override the shared configuration for Android
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            // You can also override the shared configurations for iOS
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

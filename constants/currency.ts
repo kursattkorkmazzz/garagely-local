@@ -6,10 +6,3 @@ export const Currencies = {
 } as const;
 
 export type Currency = (typeof Currencies)[keyof typeof Currencies];
-
-export const CurrencySymbols: Record<Currency, string> = {
-  USD: "$",
-  EUR: "€",
-  TRY: "₺",
-  GBP: "£",
-};
