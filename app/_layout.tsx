@@ -10,11 +10,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "reflect-metadata";
-
 initializeGaragelyDatabase();
 
 function RootLayoutNav() {
-  const { theme, themeName } = useTheme();
+  const { theme } = useTheme();
   const isInitialized = useStore((state) => state.preferences.isInitialized);
   const initializePreferences = useStore(
     (state) => state.preferences.initialize,
