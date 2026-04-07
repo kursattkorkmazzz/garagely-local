@@ -2,8 +2,9 @@ import {
   Currencies,
   DistanceUnits,
   Languages,
-  StorageKeys,
   ThemeTypes,
+  Timezone,
+  Timezones,
   VolumeUnits,
   type Currency,
   type DistanceUnit,
@@ -11,8 +12,8 @@ import {
   type ThemeType,
   type VolumeUnit,
 } from "@/constants";
+import { UserPreferencesService } from "@/features/user-preferences";
 import { changeLanguage as i18nChangeLanguage } from "@/i18n";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface UserPreferencesSlice {
   // State
@@ -21,6 +22,7 @@ export interface UserPreferencesSlice {
   currency: Currency;
   distance: DistanceUnit;
   volume: VolumeUnit;
+  timezone: Timezone;
   isInitialized: boolean;
 
   // Actions
@@ -43,28 +45,25 @@ export const createUserPreferencesSlice = (
   currency: Currencies.USD,
   distance: DistanceUnits.KM,
   volume: VolumeUnits.LITER,
+  timezone: Timezones["Europe/Istanbul"],
   isInitialized: false,
 
   // Load all preferences from AsyncStorage
   initialize: async () => {
     try {
-      const [theme, language, currency, distance, volume] = await Promise.all([
-        AsyncStorage.getItem(StorageKeys.THEME),
-        AsyncStorage.getItem(StorageKeys.LANGUAGE),
-        AsyncStorage.getItem(StorageKeys.CURRENCY),
-        AsyncStorage.getItem(StorageKeys.DISTANCE_UNIT),
-        AsyncStorage.getItem(StorageKeys.VOLUME_UNIT),
-      ]);
-
+      const { theme, language, currency, distance, volume, timezone } =
+        await UserPreferencesService.getUserPreferences();
       const resolvedLanguage = (language as Language) ?? Languages.EN;
       await i18nChangeLanguage(resolvedLanguage);
 
       set({
         theme: (theme as ThemeType) ?? ThemeTypes.SYSTEM,
         language: resolvedLanguage,
-        currency: (currency as Currency) ?? Currencies.USD,
+        currency: (currency as Currency) ?? Currencies.TRY,
         distance: (distance as DistanceUnit) ?? DistanceUnits.KM,
         volume: (volume as VolumeUnit) ?? VolumeUnits.LITER,
+        timezone: (timezone as Timezone) ?? Timezones["Europe/Istanbul"],
+
         isInitialized: true,
       });
     } catch {
@@ -74,27 +73,27 @@ export const createUserPreferencesSlice = (
 
   setTheme: async (theme) => {
     set({ theme });
-    await AsyncStorage.setItem(StorageKeys.THEME, theme);
+    UserPreferencesService.upsertTheme(theme);
   },
 
   setLanguage: async (language) => {
     set({ language });
     await i18nChangeLanguage(language);
-    await AsyncStorage.setItem(StorageKeys.LANGUAGE, language);
+    UserPreferencesService.upsertLanguage(language);
   },
 
   setCurrency: async (currency) => {
     set({ currency });
-    await AsyncStorage.setItem(StorageKeys.CURRENCY, currency);
+    UserPreferencesService.upsertCurrency(currency);
   },
 
   setDistance: async (distance) => {
     set({ distance });
-    await AsyncStorage.setItem(StorageKeys.DISTANCE_UNIT, distance);
+    UserPreferencesService.upsertDistanceUnit(distance);
   },
 
   setVolume: async (volume) => {
     set({ volume });
-    await AsyncStorage.setItem(StorageKeys.VOLUME_UNIT, volume);
+    UserPreferencesService.upsertVolumeUnit(volume);
   },
 });
