@@ -1,10 +1,12 @@
 import { AppIcon } from "@/components/ui/app-icon";
+import { useI18n } from "@/hooks";
 import { useTheme } from "@/theme/theme-context";
 import { Tabs } from "expo-router";
 
 export default function DashboardLayout() {
   const { theme } = useTheme();
-
+  const { t: tGarage } = useI18n("garage");
+  const { t: tSettings } = useI18n("settings");
   return (
     <Tabs
       screenOptions={{
@@ -28,9 +30,9 @@ export default function DashboardLayout() {
       }}
     >
       <Tabs.Screen
-        name="garage/index"
+        name="garage"
         options={{
-          title: "Garage",
+          title: tGarage("label"),
           tabBarIcon: (props) => (
             <AppIcon icon="Car" size={props.size} color={props.color} />
           ),
@@ -39,7 +41,7 @@ export default function DashboardLayout() {
       <Tabs.Screen
         name="settings/index"
         options={{
-          title: "Settings",
+          title: tSettings("label"),
           tabBarIcon: (props) => (
             <AppIcon icon="Settings" size={props.size} color={props.color} />
           ),
