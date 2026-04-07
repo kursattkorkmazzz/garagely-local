@@ -1,4 +1,10 @@
 {
-  "km": "Kilometre",
-  "mi": "Mil"
+  "km": {
+    "long": "Kilometre",
+    "short": "km"
+  },
+  "mi": {
+    "long": "Mil",
+    "short": "mi"
+  }
 }

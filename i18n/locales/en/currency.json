@@ -1,6 +1,22 @@
 {
-  "USD": "US Dollar",
-  "EUR": "Euro",
-  "TRY": "Turkish Lira",
-  "GBP": "British Pound"
+  "USD": {
+    "long": "US Dollar",
+    "short": "USD",
+    "symbol": "$"
+  },
+  "EUR": {
+    "long": "Euro",
+    "short": "EUR",
+    "symbol": "€"
+  },
+  "TRY": {
+    "long": "Turkish Lira",
+    "short": "TRY",
+    "symbol": "₺"
+  },
+  "GBP": {
+    "long": "British Pound",
+    "short": "GBP",
+    "symbol": "£"
+  }
 }

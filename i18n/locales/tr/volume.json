@@ -1,4 +1,10 @@
 {
-  "L": "Litre",
-  "gal": "Galon"
+  "L": {
+    "long": "Litre",
+    "short": "L"
+  },
+  "gal": {
+    "long": "Galon",
+    "short": "gal"
+  }
 }
