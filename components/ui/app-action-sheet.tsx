@@ -85,6 +85,7 @@ export function AppActionSheet({
       transparent
       animationType="fade"
       onRequestClose={handleClose}
+      statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={handleClose}>
         <View
