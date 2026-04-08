@@ -1,9 +1,9 @@
 import { UserPreferencesValidator } from "@/features/user-preferences/entity/user-preferences.entity";
-import * as yup from "yup";
+import * as z from "zod";
 
 export const UpsertUserPreferencesDtoValidator =
   UserPreferencesValidator.partial();
 
-export type UpsertUserPreferencesDto = yup.InferType<
+export type UpsertUserPreferencesDto = z.infer<
   typeof UpsertUserPreferencesDtoValidator
 >;

@@ -1,27 +1,20 @@
-import * as yup from "yup";
-
 import {
   Currencies,
-  Currency,
-  DistanceUnit,
   DistanceUnits,
-  Language,
   Languages,
-  ThemeType,
   ThemeTypes,
-  VolumeUnit,
+  Timezones,
   VolumeUnits,
 } from "@/constants";
+import * as z from "zod";
 
-export const UserPreferencesValidator = yup.object().shape({
-  theme: yup.mixed<ThemeType>().oneOf(Object.values(ThemeTypes)),
-  language: yup.mixed<Language>().oneOf(Object.values(Languages)),
-  currency: yup.mixed<Currency>().oneOf(Object.values(Currencies)),
-  distance: yup.mixed<DistanceUnit>().oneOf(Object.values(DistanceUnits)),
-  volume: yup.mixed<VolumeUnit>().oneOf(Object.values(VolumeUnits)),
-  timezone: yup.string(),
+export const UserPreferencesValidator = z.object({
+  theme: z.enum(Object.values(ThemeTypes)),
+  language: z.enum(Object.values(Languages)),
+  currency: z.enum(Object.values(Currencies)),
+  distance: z.enum(Object.values(DistanceUnits)),
+  volume: z.enum(Object.values(VolumeUnits)),
+  timezone: z.enum(Object.values(Timezones)),
 });
 
-export type UserPreferencesEntity = yup.InferType<
-  typeof UserPreferencesValidator
->;
+export type UserPreferencesEntity = z.infer<typeof UserPreferencesValidator>;

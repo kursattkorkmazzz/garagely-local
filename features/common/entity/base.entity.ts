@@ -8,16 +8,16 @@ import {
 @Entity()
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn("uuid")
-  abstract id: string;
+  id!: string;
 
   @CreateDateColumn({
     utc: true,
   })
-  abstract createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({
     utc: true,
     nullable: true,
   })
-  abstract updatedAt: Date | null;
+  updatedAt!: Date | null;
 }
