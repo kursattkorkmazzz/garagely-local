@@ -5,7 +5,9 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-@Entity()
+@Entity({
+  withoutRowid: true,
+})
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
