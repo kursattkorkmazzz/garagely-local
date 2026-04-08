@@ -1,8 +1,9 @@
 import { AppLaunchingComponent } from "@/components/app-start/app-launching-component";
-import { initializeGaragelyDatabase } from "@/db";
+import { expoDB } from "@/db/database";
 import { initI18n } from "@/i18n";
 import { useStore } from "@/store/store";
 import { ThemeProvider, useTheme } from "@/theme/theme-context";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -10,7 +11,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "reflect-metadata";
-initializeGaragelyDatabase();
 
 function RootLayoutNav() {
   const { theme } = useTheme();
@@ -36,6 +36,9 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  //TODO: Remove this at the production build.
+  useDrizzleStudio(expoDB);
+
   const [isReady, setIsReady] = useState(false);
   useEffect(() => {
     async function init() {

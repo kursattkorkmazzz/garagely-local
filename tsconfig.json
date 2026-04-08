@@ -16,6 +16,7 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "store/root-store"
+    "store/root-store",
+    "metro.config.js"
   ]
 }

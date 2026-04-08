@@ -1,32 +1,19 @@
-import { DataSource } from "typeorm";
+import { drizzle } from "drizzle-orm/expo-sqlite";
 
-const GaragelyDatabase = new DataSource({
-  type: "expo",
-  driver: require("expo-sqlite"),
-  database: "garagely.db",
-  synchronize: true,
+import SQLite from "expo-sqlite";
 
-  logging: false,
-  maxQueryExecutionTime: 1000,
+//TODO: Remove export at the production build.
+export const expoDB = SQLite.openDatabaseSync("garagely.db");
 
-  invalidWhereValuesBehavior: {
-    null: "sql-null",
-    undefined: "ignore",
-  },
-
-  entities: [],
+const GaragelyDatabase = drizzle(expoDB, {
+  casing: "snake_case",
+  logger: false,
 });
 
 export function getGaragelyDatabase() {
-  if (!GaragelyDatabase.isInitialized) {
-    throw new Error(
-      "GaragelyDatabase is not initialized. Please call initializeGaragelyDatabase() before using it.",
-    );
-  }
   return GaragelyDatabase;
 }
 
 export function initializeGaragelyDatabase() {
-  if (GaragelyDatabase.isInitialized) return;
-  return GaragelyDatabase.initialize();
+  return GaragelyDatabase;
 }

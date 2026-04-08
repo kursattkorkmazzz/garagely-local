@@ -1,3 +1,3 @@
-export enum AssetType = {
-    IMAGE: "image",
+export enum AssetType {
+  IMAGE = "image",
 }
