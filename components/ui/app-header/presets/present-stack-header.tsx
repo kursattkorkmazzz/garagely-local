@@ -49,7 +49,9 @@ export function presentStackHeader(options: StackHeaderOptions) {
     return (
       <AppHeader
         LeftSlot={<HeaderBackButton />}
-        CenterSlot={<HeaderTitle title={title} subtitle={description} align="left" />}
+        CenterSlot={
+          <HeaderTitle title={title} subtitle={description} align="left" />
+        }
         RightSlot={rightActions ?? undefined}
       />
     );

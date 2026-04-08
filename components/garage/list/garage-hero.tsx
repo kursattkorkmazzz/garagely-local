@@ -6,7 +6,7 @@ import { spacing } from "@/theme/tokens/spacing";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 
-export function GarageListHero() {
+export function GarageHero() {
   const { t: tGarage } = useI18n("garage");
 
   return (

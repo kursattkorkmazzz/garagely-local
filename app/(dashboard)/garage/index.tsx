@@ -1,4 +1,4 @@
-import { GarageListHero } from "@/components/garage/list/garage-list-hero";
+import { GarageHero } from "@/components/garage/list/garage-hero";
 import { IconName } from "@/components/ui/app-icon";
 import {
   AppListItem,
@@ -9,6 +9,8 @@ import {
 import { AppList, ListSection } from "@/components/ui/app-list/app-list";
 import { useI18n } from "@/hooks";
 import { spacing } from "@/theme/tokens/spacing";
+import { router } from "expo-router";
+import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 type GarageListItem = {
   id: string;
@@ -18,33 +20,37 @@ type GarageListItem = {
   subtitle: string;
 };
 
-export default function GarageList() {
+export default function Garage() {
   const { t: tGarage } = useI18n("garage");
 
-  const VEHICLES_SECTION: ListSection<GarageListItem> = {
-    key: "vehicles",
-    label: tGarage("vehicles.label"),
-    description: tGarage("vehicles.description"),
-    data: [
+  const VEHICLES_SECTION: ListSection<GarageListItem>[] = useMemo(
+    () => [
       {
-        id: "vehicles",
-        icon: "Car",
-        iconColor: "#3B82F6",
-        title: tGarage("vehicles.items.vehicles.label"),
-        subtitle: tGarage("vehicles.items.vehicles.description"),
+        key: "vehicles",
+        label: tGarage("vehicles.label"),
+        description: tGarage("vehicles.description"),
+        data: [
+          {
+            id: "vehicles",
+            icon: "Car",
+            iconColor: "#3B82F6",
+            title: tGarage("vehicles.items.vehicles.label"),
+            subtitle: tGarage("vehicles.items.vehicles.description"),
+          },
+        ],
       },
     ],
-  };
+    [tGarage],
+  );
 
   const handleItemPress = (itemId: string) => {
-    // TODO: Navigate to respective screens
-    console.log("Navigate to:", itemId);
+    router.push(`./garage/${itemId}`); // Navigate to the corresponding screen based on item ID
   };
 
   return (
     <AppList
       contentContainerStyle={styles.listContent}
-      sections={[VEHICLES_SECTION]}
+      sections={VEHICLES_SECTION}
       renderItem={(item) => (
         <AppListItem
           LeftSlot={<ListItemIcon icon={item.icon} color={item.iconColor} />}
@@ -55,7 +61,7 @@ export default function GarageList() {
           onPress={() => handleItemPress(item.id)}
         />
       )}
-      ListHeaderComponent={<GarageListHero />}
+      ListHeaderComponent={<GarageHero />}
     />
   );
 }
@@ -63,7 +69,6 @@ export default function GarageList() {
 const styles = StyleSheet.create({
   listContent: {
     flex: 1,
-    paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
   },
 });

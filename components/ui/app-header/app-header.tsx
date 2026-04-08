@@ -25,7 +25,7 @@ export function AppHeader({
   CenterSlot,
   RightSlot,
   BottomSlot,
-  includeSafeArea = true,
+  includeSafeArea = false,
   backgroundColor,
   style,
 }: AppHeaderProps) {
@@ -59,8 +59,9 @@ export function AppHeader({
 
 export const headerStyles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
   },
   topRow: {
     flexDirection: "row",
