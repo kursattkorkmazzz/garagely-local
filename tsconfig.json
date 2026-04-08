@@ -17,6 +17,7 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "store/root-store",
-    "metro.config.js"
+    "metro.config.js",
+    "features/asset/repository/file-system-storage.repository.ts"
   ]
 }
