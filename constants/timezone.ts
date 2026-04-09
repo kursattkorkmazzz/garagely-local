@@ -1,3 +1,5 @@
+import z from "zod";
+
 export const Timezones = {
   "Africa/Abidjan": "Africa/Abidjan",
   "Africa/Accra": "Africa/Accra",
@@ -420,3 +422,10 @@ export const Timezones = {
 } as const;
 
 export type Timezone = keyof typeof Timezones;
+
+export const DateDtoValidator = z.object({
+  date: z.int(),
+  timezone: z.enum(Timezones),
+});
+
+export type DateDto = z.infer<typeof DateDtoValidator>;
