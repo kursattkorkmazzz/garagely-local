@@ -4,11 +4,18 @@ import { DistanceSchema } from "@/db/schemas/commons/distance.schema";
 import { MoneySchema } from "@/db/schemas/commons/money.schema";
 import { VehicleSchema } from "@/db/schemas/vehicle.schema";
 import { AssetService } from "@/features/asset";
+import {
+  buildPaginatedResult,
+  calculateOffset,
+  normalizePaginationParams,
+  PaginatedResult,
+  PaginationParams,
+} from "@/features/common";
 import { CreateVehicleDto } from "@/features/vehicle/dto/create-vehicle.dto";
 import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleErrorCodes } from "@/utils/error/error-codes";
 import { GaragelyError } from "@/utils/error/garagely-error";
-import { eq } from "drizzle-orm";
+import { asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
 
 import { VehicleRepository } from "./vehicle.repository";
 
@@ -107,12 +114,46 @@ export class SqliteVehicleRepository extends VehicleRepository {
     return this.mapToEntity(result[0]);
   }
 
-  async findAll(): Promise<VehicleEntity[]> {
+  async findAll(params?: PaginationParams): Promise<PaginatedResult<VehicleEntity>> {
     const db = getGaragelyDatabase();
+    const { page, limit, search, sorting } = normalizePaginationParams(params);
+    const offset = calculateOffset(page, limit);
 
-    const result = await db.select().from(VehicleSchema);
+    const whereConditions: SQL[] = [];
 
-    return result.map((row) => this.mapToEntity(row));
+    if (search) {
+      whereConditions.push(
+        or(
+          like(VehicleSchema.brand, `%${search}%`),
+          like(VehicleSchema.model, `%${search}%`),
+          like(VehicleSchema.plate, `%${search}%`),
+          like(VehicleSchema.vin, `%${search}%`),
+        )!,
+      );
+    }
+
+    const whereClause = whereConditions.length > 0 ? whereConditions[0] : undefined;
+
+    const orderByClause = this.buildOrderByClause(sorting);
+
+    const [totalResult, dataResult] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(VehicleSchema)
+        .where(whereClause),
+      db
+        .select()
+        .from(VehicleSchema)
+        .where(whereClause)
+        .orderBy(...orderByClause)
+        .limit(limit)
+        .offset(offset),
+    ]);
+
+    const total = totalResult[0].count;
+    const data = dataResult.map((row) => this.mapToEntity(row));
+
+    return buildPaginatedResult(data, total, page, limit);
   }
 
   async delete(id: string): Promise<void> {
@@ -140,5 +181,35 @@ export class SqliteVehicleRepository extends VehicleRepository {
       created_at: row.created_at,
       updated_at: row.updated_at,
     };
+  }
+
+  private buildOrderByClause(sorting?: PaginationParams["sorting"]): SQL[] {
+    if (!sorting || sorting.length === 0) {
+      return [desc(VehicleSchema.created_at)];
+    }
+
+    const columnMap = {
+      id: VehicleSchema.id,
+      brand: VehicleSchema.brand,
+      model: VehicleSchema.model,
+      year: VehicleSchema.year,
+      plate: VehicleSchema.plate,
+      color: VehicleSchema.color,
+      vin: VehicleSchema.vin,
+      fuelType: VehicleSchema.fuelType,
+      bodyType: VehicleSchema.bodyType,
+      transmissionType: VehicleSchema.transmissionType,
+      created_at: VehicleSchema.created_at,
+      updated_at: VehicleSchema.updated_at,
+    } as const;
+
+    type ColumnKey = keyof typeof columnMap;
+
+    return sorting
+      .filter((sort): sort is typeof sort & { sortBy: ColumnKey } => sort.sortBy in columnMap)
+      .map((sort) => {
+        const column = columnMap[sort.sortBy];
+        return sort.sortOrder === "asc" ? asc(column) : desc(column);
+      });
   }
 }

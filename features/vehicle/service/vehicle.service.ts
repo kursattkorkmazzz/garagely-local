@@ -1,3 +1,4 @@
+import { PaginatedResult, PaginationParams } from "@/features/common";
 import {
   CreateVehicleDto,
   CreateVehicleDtoValidator,
@@ -19,8 +20,8 @@ export class VehicleService {
     return this.vehicleRepository.findById(id);
   }
 
-  static async getAllVehicles(): Promise<VehicleEntity[]> {
-    return this.vehicleRepository.findAll();
+  static async getAllVehicles(params?: PaginationParams): Promise<PaginatedResult<VehicleEntity>> {
+    return this.vehicleRepository.findAll(params);
   }
 
   static async deleteVehicle(id: string): Promise<void> {

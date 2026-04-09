@@ -1,3 +1,4 @@
+import { PaginatedResult, PaginationParams } from "@/features/common";
 import { getExtensionFromMimeType } from "@/features/asset/contants/mime-types";
 import {
   CreateAssetDto,
@@ -40,6 +41,10 @@ export class AssetService {
 
   static async getAsset(id: string): Promise<AssetRecord | null> {
     return this.assetRepository.findById(id);
+  }
+
+  static async getAllAssets(params?: PaginationParams): Promise<PaginatedResult<AssetRecord>> {
+    return this.assetRepository.findAll(params);
   }
 
   static async assetExists(id: string): Promise<boolean> {
