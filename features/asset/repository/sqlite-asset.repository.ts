@@ -9,14 +9,13 @@ import {
 } from "@/features/common";
 import { asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
 
-import {
-  AssetRecord,
-  AssetRepository,
-  CreateAssetParams,
-} from "./asset.repository";
+import { AssetEntity } from "@/features/asset/entity/asset.entity";
+
+import { AssetRepository } from "./asset.repository";
+import { CreateAssetParams } from "./params";
 
 export class SqliteAssetRepository extends AssetRepository {
-  async save(params: CreateAssetParams): Promise<AssetRecord> {
+  async save(params: CreateAssetParams): Promise<AssetEntity> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -35,7 +34,7 @@ export class SqliteAssetRepository extends AssetRepository {
     return this.mapToRecord(inserted);
   }
 
-  async findById(id: string): Promise<AssetRecord | null> {
+  async findById(id: string): Promise<AssetEntity | null> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -51,7 +50,7 @@ export class SqliteAssetRepository extends AssetRepository {
     return this.mapToRecord(result[0]);
   }
 
-  async findAll(params?: PaginationParams): Promise<PaginatedResult<AssetRecord>> {
+  async findAll(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>> {
     const db = getGaragelyDatabase();
     const { page, limit, search, sorting } = normalizePaginationParams(params);
     const offset = calculateOffset(page, limit);
@@ -109,12 +108,12 @@ export class SqliteAssetRepository extends AssetRepository {
     await db.delete(AssetSchema).where(eq(AssetSchema.id, id));
   }
 
-  private mapToRecord(row: typeof AssetSchema.$inferSelect): AssetRecord {
+  private mapToRecord(row: typeof AssetSchema.$inferSelect): AssetEntity {
     return {
       id: row.id,
       name: row.name,
       path: row.path,
-      mimeType: row.mimeType as AssetRecord["mimeType"],
+      mimeType: row.mimeType as AssetEntity["mimeType"],
       size: row.size,
       creationTime: row.creationTime,
       created_at: row.created_at,

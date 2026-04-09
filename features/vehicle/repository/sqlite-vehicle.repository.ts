@@ -11,7 +11,7 @@ import {
   PaginatedResult,
   PaginationParams,
 } from "@/features/common";
-import { CreateVehicleDto } from "@/features/vehicle/dto/create-vehicle.dto";
+import { CreateVehicleParams } from "./params";
 import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleErrorCodes } from "@/utils/error/error-codes";
 import { GaragelyError } from "@/utils/error/garagely-error";
@@ -20,7 +20,7 @@ import { asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
 import { VehicleRepository } from "./vehicle.repository";
 
 export class SqliteVehicleRepository extends VehicleRepository {
-  async save(data: CreateVehicleDto): Promise<VehicleEntity> {
+  async save(data: CreateVehicleParams): Promise<VehicleEntity> {
     const db = getGaragelyDatabase();
 
     const result = await db.transaction(async (tx) => {
@@ -85,7 +85,7 @@ export class SqliteVehicleRepository extends VehicleRepository {
           coverImageId: data.coverImageId,
           fuelType: data.fuelType,
           bodyType: data.bodyType,
-          transmissionType: data.transmissiontype,
+          transmissionType: data.transmissionType,
           purchasePriceId,
           purchaseDateId,
           purchaseOdometerId,

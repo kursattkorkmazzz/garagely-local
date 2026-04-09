@@ -1,29 +1,12 @@
 import { PaginatedResult, PaginationParams } from "@/features/common";
-import { ImageMimeType } from "@/features/asset/contants/mime-types/image-mime-types";
+import { AssetEntity } from "@/features/asset/entity/asset.entity";
 
-export type AssetRecord = {
-  id: string;
-  name: string;
-  path: string;
-  mimeType: ImageMimeType;
-  size: number | null;
-  creationTime: Date | null;
-  created_at: Date;
-  updated_at: Date | null;
-};
-
-export type CreateAssetParams = {
-  name: string;
-  path: string;
-  mimeType: ImageMimeType;
-  size: number | null;
-  creationTime: Date | null;
-};
+import { CreateAssetParams } from "./params";
 
 export abstract class AssetRepository {
-  abstract save(params: CreateAssetParams): Promise<AssetRecord>;
-  abstract findById(id: string): Promise<AssetRecord | null>;
-  abstract findAll(params?: PaginationParams): Promise<PaginatedResult<AssetRecord>>;
+  abstract save(params: CreateAssetParams): Promise<AssetEntity>;
+  abstract findById(id: string): Promise<AssetEntity | null>;
+  abstract findAll(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>>;
   abstract exists(id: string): Promise<boolean>;
   abstract delete(id: string): Promise<void>;
 }

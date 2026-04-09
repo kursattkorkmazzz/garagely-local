@@ -1,4 +1,4 @@
-import { MoneyRecord, DateRecord, DistanceRecord } from "@/features/common";
+import { DateEntity, DistanceEntity, MoneyEntity } from "@/features/common";
 import { BodyType, FuelType, TransmissionType } from "@/features/vehicle/constants";
 
 export type VehicleEntity = {
@@ -25,7 +25,7 @@ export type VehicleEntity = {
 };
 
 export type VehicleWithDetails = VehicleEntity & {
-  purchaseDate: DateRecord | null;
-  purchasePrice: MoneyRecord | null;
-  purchaseOdometer: DistanceRecord | null;
+  purchaseDate: DateEntity | null;
+  purchasePrice: MoneyEntity | null;
+  purchaseOdometer: DistanceEntity | null;
 };

@@ -2,7 +2,7 @@ import { PaginatedResult, PaginationParams } from "@/features/common";
 import {
   CreateVehicleDto,
   CreateVehicleDtoValidator,
-} from "@/features/vehicle/dto/create-vehicle.dto";
+} from "./dto/create-vehicle.dto";
 import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
 import { SqliteVehicleRepository } from "@/features/vehicle/repository/sqlite-vehicle.repository";
 import { VehicleRepository } from "@/features/vehicle/repository/vehicle.repository";

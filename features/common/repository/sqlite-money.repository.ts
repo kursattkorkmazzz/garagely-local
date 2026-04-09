@@ -1,15 +1,13 @@
 import { getGaragelyDatabase } from "@/db";
 import { MoneySchema } from "@/db/schemas/commons/money.schema";
+import { MoneyEntity } from "@/features/common/entity/money.entity";
 import { eq } from "drizzle-orm";
 
-import {
-  CreateMoneyParams,
-  MoneyRecord,
-  MoneyRepository,
-} from "./money.repository";
+import { MoneyRepository } from "./money.repository";
+import { CreateMoneyParams } from "./params";
 
 export class SqliteMoneyRepository extends MoneyRepository {
-  async save(params: CreateMoneyParams): Promise<MoneyRecord> {
+  async save(params: CreateMoneyParams): Promise<MoneyEntity> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -25,13 +23,13 @@ export class SqliteMoneyRepository extends MoneyRepository {
     return {
       id: inserted.id,
       amount: inserted.amount,
-      currency: inserted.currency as MoneyRecord["currency"],
+      currency: inserted.currency as MoneyEntity["currency"],
       created_at: inserted.created_at,
       updated_at: inserted.updated_at,
     };
   }
 
-  async findById(id: string): Promise<MoneyRecord | null> {
+  async findById(id: string): Promise<MoneyEntity | null> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -49,7 +47,7 @@ export class SqliteMoneyRepository extends MoneyRepository {
     return {
       id: row.id,
       amount: row.amount,
-      currency: row.currency as MoneyRecord["currency"],
+      currency: row.currency as MoneyEntity["currency"],
       created_at: row.created_at,
       updated_at: row.updated_at,
     };

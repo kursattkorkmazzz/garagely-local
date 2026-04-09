@@ -1,15 +1,13 @@
 import { getGaragelyDatabase } from "@/db";
 import { DistanceSchema } from "@/db/schemas/commons/distance.schema";
+import { DistanceEntity } from "@/features/common/entity/distance.entity";
 import { eq } from "drizzle-orm";
 
-import {
-  CreateDistanceParams,
-  DistanceRecord,
-  DistanceRepository,
-} from "./distance.repository";
+import { DistanceRepository } from "./distance.repository";
+import { CreateDistanceParams } from "./params";
 
 export class SqliteDistanceRepository extends DistanceRepository {
-  async save(params: CreateDistanceParams): Promise<DistanceRecord> {
+  async save(params: CreateDistanceParams): Promise<DistanceEntity> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -25,13 +23,13 @@ export class SqliteDistanceRepository extends DistanceRepository {
     return {
       id: inserted.id,
       amount: inserted.amount,
-      unit: inserted.unit as DistanceRecord["unit"],
+      unit: inserted.unit as DistanceEntity["unit"],
       created_at: inserted.created_at,
       updated_at: inserted.updated_at,
     };
   }
 
-  async findById(id: string): Promise<DistanceRecord | null> {
+  async findById(id: string): Promise<DistanceEntity | null> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -49,7 +47,7 @@ export class SqliteDistanceRepository extends DistanceRepository {
     return {
       id: row.id,
       amount: row.amount,
-      unit: row.unit as DistanceRecord["unit"],
+      unit: row.unit as DistanceEntity["unit"],
       created_at: row.created_at,
       updated_at: row.updated_at,
     };

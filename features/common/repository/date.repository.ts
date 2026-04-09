@@ -1,20 +1,9 @@
-import { Timezone } from "@/constants";
+import { DateEntity } from "@/features/common/entity/date.entity";
 
-export type DateRecord = {
-  id: string;
-  date: Date;
-  timezone: Timezone;
-  created_at: Date;
-  updated_at: Date | null;
-};
-
-export type CreateDateParams = {
-  date: Date;
-  timezone: Timezone;
-};
+import { CreateDateParams } from "./params";
 
 export abstract class DateRepository {
-  abstract save(params: CreateDateParams): Promise<DateRecord>;
-  abstract findById(id: string): Promise<DateRecord | null>;
+  abstract save(params: CreateDateParams): Promise<DateEntity>;
+  abstract findById(id: string): Promise<DateEntity | null>;
   abstract delete(id: string): Promise<void>;
 }

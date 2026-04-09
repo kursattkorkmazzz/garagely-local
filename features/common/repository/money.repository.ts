@@ -1,20 +1,9 @@
-import { Currency } from "@/constants";
+import { MoneyEntity } from "@/features/common/entity/money.entity";
 
-export type MoneyRecord = {
-  id: string;
-  amount: number;
-  currency: Currency;
-  created_at: Date;
-  updated_at: Date | null;
-};
-
-export type CreateMoneyParams = {
-  amount: number;
-  currency: Currency;
-};
+import { CreateMoneyParams } from "./params";
 
 export abstract class MoneyRepository {
-  abstract save(params: CreateMoneyParams): Promise<MoneyRecord>;
-  abstract findById(id: string): Promise<MoneyRecord | null>;
+  abstract save(params: CreateMoneyParams): Promise<MoneyEntity>;
+  abstract findById(id: string): Promise<MoneyEntity | null>;
   abstract delete(id: string): Promise<void>;
 }

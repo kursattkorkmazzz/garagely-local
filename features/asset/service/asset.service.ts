@@ -3,11 +3,9 @@ import { getExtensionFromMimeType } from "@/features/asset/contants/mime-types";
 import {
   CreateAssetDto,
   CreateAssetDtoValidator,
-} from "@/features/asset/dto/create-asset.dto";
-import {
-  AssetRecord,
-  AssetRepository,
-} from "@/features/asset/repository/asset.repository";
+} from "./dto/create-asset.dto";
+import { AssetEntity } from "@/features/asset/entity/asset.entity";
+import { AssetRepository } from "@/features/asset/repository/asset.repository";
 import { FileSystemStorageRepository } from "@/features/asset/repository/file-system-storage.repository";
 import { SqliteAssetRepository } from "@/features/asset/repository/sqlite-asset.repository";
 import { StorageRepository } from "@/features/asset/repository/storage.repository";
@@ -17,7 +15,7 @@ export class AssetService {
     new FileSystemStorageRepository();
   private static assetRepository: AssetRepository = new SqliteAssetRepository();
 
-  static async saveAsset(data: CreateAssetDto): Promise<AssetRecord> {
+  static async saveAsset(data: CreateAssetDto): Promise<AssetEntity> {
     const validatedData = CreateAssetDtoValidator.parse(data);
 
     const extension = getExtensionFromMimeType(validatedData.mimeType);
@@ -39,11 +37,11 @@ export class AssetService {
     return assetRecord;
   }
 
-  static async getAsset(id: string): Promise<AssetRecord | null> {
+  static async getAsset(id: string): Promise<AssetEntity | null> {
     return this.assetRepository.findById(id);
   }
 
-  static async getAllAssets(params?: PaginationParams): Promise<PaginatedResult<AssetRecord>> {
+  static async getAllAssets(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>> {
     return this.assetRepository.findAll(params);
   }
 

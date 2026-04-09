@@ -1,15 +1,13 @@
 import { getGaragelyDatabase } from "@/db";
 import { DateSchema } from "@/db/schemas/commons/date.schema";
+import { DateEntity } from "@/features/common/entity/date.entity";
 import { eq } from "drizzle-orm";
 
-import {
-  CreateDateParams,
-  DateRecord,
-  DateRepository,
-} from "./date.repository";
+import { DateRepository } from "./date.repository";
+import { CreateDateParams } from "./params";
 
 export class SqliteDateRepository extends DateRepository {
-  async save(params: CreateDateParams): Promise<DateRecord> {
+  async save(params: CreateDateParams): Promise<DateEntity> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -25,13 +23,13 @@ export class SqliteDateRepository extends DateRepository {
     return {
       id: inserted.id,
       date: inserted.date,
-      timezone: inserted.timezone as DateRecord["timezone"],
+      timezone: inserted.timezone as DateEntity["timezone"],
       created_at: inserted.created_at,
       updated_at: inserted.updated_at,
     };
   }
 
-  async findById(id: string): Promise<DateRecord | null> {
+  async findById(id: string): Promise<DateEntity | null> {
     const db = getGaragelyDatabase();
 
     const result = await db
@@ -49,7 +47,7 @@ export class SqliteDateRepository extends DateRepository {
     return {
       id: row.id,
       date: row.date,
-      timezone: row.timezone as DateRecord["timezone"],
+      timezone: row.timezone as DateEntity["timezone"],
       created_at: row.created_at,
       updated_at: row.updated_at,
     };
