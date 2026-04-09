@@ -1,3 +1,4 @@
+import { AssetStatusType } from "@/features/asset/contants/asset-status";
 import { ImageMimeType } from "@/features/asset/contants/mime-types";
 
 export type AssetEntity = {
@@ -7,6 +8,7 @@ export type AssetEntity = {
   mimeType: ImageMimeType;
   size: number | null;
   creationTime: Date | null;
+  status: AssetStatusType;
   created_at: Date;
   updated_at: Date | null;
 };

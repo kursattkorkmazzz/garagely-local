@@ -92,6 +92,11 @@ export class SqliteVehicleRepository extends VehicleRepository {
         })
         .returning();
 
+      // 6. Confirm cover image asset if provided
+      if (data.coverImageId) {
+        await AssetService.confirmAsset(data.coverImageId);
+      }
+
       return vehicleResult[0];
     });
 

@@ -3,6 +3,11 @@
   "editVehicle": "Edit Vehicle",
   "addToFleet": "Add to Fleet",
   "updateVehicle": "Update Vehicle",
+  "form": {
+    "back": "Back",
+    "next": "Next",
+    "save": "Save"
+  },
   "image": {
     "title": "Add Vehicle Image",
     "description": "Upload a clear photo of your car"

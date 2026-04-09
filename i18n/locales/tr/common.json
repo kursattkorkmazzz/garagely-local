@@ -15,5 +15,8 @@
   "permissions": {
     "cameraDenied": "Fotograf cekmek icin kamera izni gerekli",
     "libraryDenied": "Fotograf secmek icin galeri izni gerekli"
+  },
+  "errors": {
+    "uploadFailed": "Gorsel yuklenemedi"
   }
 }

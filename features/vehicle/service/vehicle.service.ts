@@ -1,11 +1,11 @@
 import { PaginatedResult, PaginationParams } from "@/features/common";
+import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
+import { SqliteVehicleRepository } from "@/features/vehicle/repository/sqlite-vehicle.repository";
+import { VehicleRepository } from "@/features/vehicle/repository/vehicle.repository";
 import {
   CreateVehicleDto,
   CreateVehicleDtoValidator,
 } from "./dto/create-vehicle.dto";
-import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
-import { SqliteVehicleRepository } from "@/features/vehicle/repository/sqlite-vehicle.repository";
-import { VehicleRepository } from "@/features/vehicle/repository/vehicle.repository";
 
 export class VehicleService {
   private static vehicleRepository: VehicleRepository =
@@ -20,7 +20,9 @@ export class VehicleService {
     return this.vehicleRepository.findById(id);
   }
 
-  static async getAllVehicles(params?: PaginationParams): Promise<PaginatedResult<VehicleEntity>> {
+  static async getAllVehicles(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleEntity>> {
     return this.vehicleRepository.findAll(params);
   }
 

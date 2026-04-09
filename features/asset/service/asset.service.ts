@@ -1,4 +1,5 @@
 import { PaginatedResult, PaginationParams } from "@/features/common";
+import { PENDING_ASSET_CLEANUP_THRESHOLD_HOURS } from "@/features/asset/contants/asset-status";
 import { getExtensionFromMimeType } from "@/features/asset/contants/mime-types";
 import {
   CreateAssetDto,
@@ -55,6 +56,19 @@ export class AssetService {
       await this.storageRepository.deleteFile(asset.path);
       await this.assetRepository.delete(id);
     }
+  }
+
+  static async confirmAsset(id: string): Promise<void> {
+    await this.assetRepository.confirm(id);
+  }
+
+  static async cleanupPendingAssets(options?: { olderThanHours?: number }): Promise<number> {
+    const thresholdHours = options?.olderThanHours ?? PENDING_ASSET_CLEANUP_THRESHOLD_HOURS;
+    const thresholdDate = new Date(Date.now() - thresholdHours * 60 * 60 * 1000);
+
+    const deletedCount = await this.assetRepository.deletePendingOlderThan(thresholdDate);
+
+    return deletedCount;
   }
 
   static getAssetUri(path: string): string {

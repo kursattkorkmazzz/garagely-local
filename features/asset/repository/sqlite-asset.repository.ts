@@ -1,5 +1,6 @@
 import { getGaragelyDatabase } from "@/db";
 import { AssetSchema } from "@/db/schemas/asset.schema";
+import { AssetStatus } from "@/features/asset/contants/asset-status";
 import {
   buildPaginatedResult,
   calculateOffset,
@@ -7,7 +8,7 @@ import {
   PaginatedResult,
   PaginationParams,
 } from "@/features/common";
-import { asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, like, lt, or, SQL } from "drizzle-orm";
 
 import { AssetEntity } from "@/features/asset/entity/asset.entity";
 
@@ -26,12 +27,13 @@ export class SqliteAssetRepository extends AssetRepository {
         mimeType: params.mimeType,
         size: params.size,
         creationTime: params.creationTime,
+        status: AssetStatus.PENDING,
       })
       .returning();
 
     const inserted = result[0];
 
-    return this.mapToRecord(inserted);
+    return this.mapToEntity(inserted);
   }
 
   async findById(id: string): Promise<AssetEntity | null> {
@@ -47,7 +49,7 @@ export class SqliteAssetRepository extends AssetRepository {
       return null;
     }
 
-    return this.mapToRecord(result[0]);
+    return this.mapToEntity(result[0]);
   }
 
   async findAll(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>> {
@@ -85,7 +87,7 @@ export class SqliteAssetRepository extends AssetRepository {
     ]);
 
     const total = totalResult[0].count;
-    const data = dataResult.map((row) => this.mapToRecord(row));
+    const data = dataResult.map((row) => this.mapToEntity(row));
 
     return buildPaginatedResult(data, total, page, limit);
   }
@@ -108,7 +110,32 @@ export class SqliteAssetRepository extends AssetRepository {
     await db.delete(AssetSchema).where(eq(AssetSchema.id, id));
   }
 
-  private mapToRecord(row: typeof AssetSchema.$inferSelect): AssetEntity {
+  async confirm(id: string): Promise<void> {
+    const db = getGaragelyDatabase();
+
+    await db
+      .update(AssetSchema)
+      .set({ status: AssetStatus.CONFIRMED })
+      .where(eq(AssetSchema.id, id));
+  }
+
+  async deletePendingOlderThan(thresholdDate: Date): Promise<number> {
+    const db = getGaragelyDatabase();
+
+    const result = await db
+      .delete(AssetSchema)
+      .where(
+        and(
+          eq(AssetSchema.status, AssetStatus.PENDING),
+          lt(AssetSchema.created_at, thresholdDate),
+        ),
+      )
+      .returning({ id: AssetSchema.id });
+
+    return result.length;
+  }
+
+  private mapToEntity(row: typeof AssetSchema.$inferSelect): AssetEntity {
     return {
       id: row.id,
       name: row.name,
@@ -116,6 +143,7 @@ export class SqliteAssetRepository extends AssetRepository {
       mimeType: row.mimeType as AssetEntity["mimeType"],
       size: row.size,
       creationTime: row.creationTime,
+      status: row.status as AssetEntity["status"],
       created_at: row.created_at,
       updated_at: row.updated_at,
     };
@@ -132,6 +160,7 @@ export class SqliteAssetRepository extends AssetRepository {
       path: AssetSchema.path,
       mimeType: AssetSchema.mimeType,
       size: AssetSchema.size,
+      status: AssetSchema.status,
       creationTime: AssetSchema.creationTime,
       created_at: AssetSchema.created_at,
       updated_at: AssetSchema.updated_at,

@@ -1,6 +1,10 @@
 import { BaseSchema } from "@/db/helpers/base.schema";
-import { BodyTypes, FuelTypes, TransmissionTypes } from "@/features/vehicle";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+
+// Inline enums to avoid React Native imports in drizzle-kit
+const FuelTypesEnum = ["gasoline", "diesel", "electric", "hybrid", "lpg"] as const;
+const BodyTypesEnum = ["sedan", "hatchback", "suv", "coupe", "pickup", "van", "wagon", "convertible"] as const;
+const TransmissionTypesEnum = ["manual", "automatic", "cvt"] as const;
 
 export const VehicleSchema = sqliteTable("vehicles", {
   ...BaseSchema,
@@ -17,13 +21,13 @@ export const VehicleSchema = sqliteTable("vehicles", {
 
   // Specifications
   fuelType: text({
-    enum: Object.values(FuelTypes) as [string, ...string[]],
+    enum: FuelTypesEnum,
   }),
   bodyType: text({
-    enum: Object.values(BodyTypes) as [string, ...string[]],
+    enum: BodyTypesEnum,
   }),
   transmissionType: text({
-    enum: Object.values(TransmissionTypes) as [string, ...string[]],
+    enum: TransmissionTypesEnum,
   }),
 
   // Purchase Information

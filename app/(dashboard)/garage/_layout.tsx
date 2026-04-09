@@ -4,14 +4,16 @@ import { AppIcon } from "@/components/ui/app-icon";
 import { useI18n } from "@/hooks";
 import { useTheme } from "@/theme/theme-context";
 import { spacing } from "@/theme/tokens/spacing";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 
 export default function GarageLayout() {
   const { theme } = useTheme();
   const { t: tGarage } = useI18n("garage");
+  const { t: tVehicle } = useI18n("vehicle");
+  const router = useRouter();
 
   const addVehicleActionHandler = () => {
-    console.log("Add Vehicle Clicked!");
+    router.push("/(dashboard)/garage/vehicles/create");
   };
 
   return (
@@ -42,6 +44,17 @@ export default function GarageLayout() {
                 <AppIcon icon="Plus" color={theme.primary} />
               </AppButton>
             ),
+          }),
+        }}
+      />
+      <Stack.Screen
+        name="vehicles/create"
+        options={{
+          title: tVehicle("addVehicle"),
+          headerShown: true,
+          presentation: "fullScreenModal",
+          header: presentStackHeader({
+            title: tVehicle("addVehicle"),
           }),
         }}
       />

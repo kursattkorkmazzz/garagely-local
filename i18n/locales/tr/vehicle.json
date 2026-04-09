@@ -3,6 +3,11 @@
   "editVehicle": "Araci Duzenle",
   "addToFleet": "Filoya Ekle",
   "updateVehicle": "Araci Guncelle",
+  "form": {
+    "back": "Geri",
+    "next": "Ileri",
+    "save": "Kaydet"
+  },
   "image": {
     "title": "Arac Gorseli Ekle",
     "description": "Aracinizin net bir fotografini yukleyin"

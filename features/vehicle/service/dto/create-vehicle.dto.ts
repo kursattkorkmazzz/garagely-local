@@ -27,7 +27,7 @@ export const CreateVehicleDtoValidator = z.object({
   // Specifications
   fuelType: z.enum(FuelTypes).optional(),
   bodyType: z.enum(BodyTypes).optional(),
-  transmissiontype: z.enum(TransmissionTypes).optional(),
+  transmissionType: z.enum(TransmissionTypes).optional(),
 
   // Purchase Information
   purchaseDate: DateDtoValidator.optional(),

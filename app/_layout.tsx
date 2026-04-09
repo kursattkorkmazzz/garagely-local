@@ -44,6 +44,8 @@ export default function RootLayout() {
     async function init() {
       //await initDatabase();
       await initI18n();
+      // Cleanup orphaned pending assets on app start
+      // await AssetService.cleanupPendingAssets();
       setIsReady(true);
     }
     init();

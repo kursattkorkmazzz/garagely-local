@@ -9,4 +9,6 @@ export abstract class AssetRepository {
   abstract findAll(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>>;
   abstract exists(id: string): Promise<boolean>;
   abstract delete(id: string): Promise<void>;
+  abstract confirm(id: string): Promise<void>;
+  abstract deletePendingOlderThan(thresholdDate: Date): Promise<number>;
 }
