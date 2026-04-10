@@ -1,12 +1,11 @@
-import { Currency, DistanceUnit } from "@/constants";
+import { Currency, DistanceUnit, Timezone } from "@/constants";
 import { BodyType, FuelType, TransmissionType } from "@/features/vehicle";
 import { Formik, useFormikContext } from "formik";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 export type VehicleFormValues = {
-  coverImageId?: string;
-  coverImageUri?: string; // Local URI for preview
-
+  coverImageId?: string; // ID of the current asset
+  selectedCoverImageUri?: string; // URI of the uploaded asset
   brand: string;
   model: string;
   year: number;
@@ -19,16 +18,18 @@ export type VehicleFormValues = {
   transmissionType?: TransmissionType;
 
   purchaseDate?: number;
-  purchaseTimezone?: string;
+  purchaseTimezone?: Timezone;
+
   purchasePrice?: number;
   purchaseCurrency?: Currency;
+
   purchaseOdometer?: number;
   purchaseOdometerUnit?: DistanceUnit;
 };
 
 const initialValues: VehicleFormValues = {
   coverImageId: undefined,
-  coverImageUri: undefined,
+  selectedCoverImageUri: undefined,
   brand: "",
   model: "",
   year: new Date().getFullYear(),

@@ -17,7 +17,7 @@ import { CreateAssetParams } from "./params";
 
 export class SqliteAssetRepository extends AssetRepository {
   async save(params: CreateAssetParams): Promise<AssetEntity> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db
       .insert(AssetSchema)
@@ -37,7 +37,7 @@ export class SqliteAssetRepository extends AssetRepository {
   }
 
   async findById(id: string): Promise<AssetEntity | null> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db
       .select()
@@ -52,8 +52,10 @@ export class SqliteAssetRepository extends AssetRepository {
     return this.mapToEntity(result[0]);
   }
 
-  async findAll(params?: PaginationParams): Promise<PaginatedResult<AssetEntity>> {
-    const db = getGaragelyDatabase();
+  async findAll(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<AssetEntity>> {
+    const db = await getGaragelyDatabase();
     const { page, limit, search, sorting } = normalizePaginationParams(params);
     const offset = calculateOffset(page, limit);
 
@@ -68,15 +70,13 @@ export class SqliteAssetRepository extends AssetRepository {
       );
     }
 
-    const whereClause = whereConditions.length > 0 ? whereConditions[0] : undefined;
+    const whereClause =
+      whereConditions.length > 0 ? whereConditions[0] : undefined;
 
     const orderByClause = this.buildOrderByClause(sorting);
 
     const [totalResult, dataResult] = await Promise.all([
-      db
-        .select({ count: count() })
-        .from(AssetSchema)
-        .where(whereClause),
+      db.select({ count: count() }).from(AssetSchema).where(whereClause),
       db
         .select()
         .from(AssetSchema)
@@ -93,7 +93,7 @@ export class SqliteAssetRepository extends AssetRepository {
   }
 
   async exists(id: string): Promise<boolean> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db
       .select({ id: AssetSchema.id })
@@ -105,13 +105,13 @@ export class SqliteAssetRepository extends AssetRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     await db.delete(AssetSchema).where(eq(AssetSchema.id, id));
   }
 
   async confirm(id: string): Promise<void> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     await db
       .update(AssetSchema)
@@ -120,7 +120,7 @@ export class SqliteAssetRepository extends AssetRepository {
   }
 
   async deletePendingOlderThan(thresholdDate: Date): Promise<number> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db
       .delete(AssetSchema)
@@ -169,7 +169,10 @@ export class SqliteAssetRepository extends AssetRepository {
     type ColumnKey = keyof typeof columnMap;
 
     return sorting
-      .filter((sort): sort is typeof sort & { sortBy: ColumnKey } => sort.sortBy in columnMap)
+      .filter(
+        (sort): sort is typeof sort & { sortBy: ColumnKey } =>
+          sort.sortBy in columnMap,
+      )
       .map((sort) => {
         const column = columnMap[sort.sortBy];
         return sort.sortOrder === "asc" ? asc(column) : desc(column);

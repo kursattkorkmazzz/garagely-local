@@ -47,7 +47,6 @@ export function BasicInfoStep() {
       setUploadProgress(90);
 
       setFieldValue("coverImageId", savedAsset.id);
-      setFieldValue("coverImageUri", AssetService.getAssetUri(savedAsset.path));
       setUploadProgress(100);
     } catch (error) {
       Toast.show({
@@ -69,7 +68,7 @@ export function BasicInfoStep() {
       }
     }
     setFieldValue("coverImageId", undefined);
-    setFieldValue("coverImageUri", undefined);
+    setFieldValue("selectedCoverImageUri", undefined);
   };
 
   return (
@@ -87,14 +86,22 @@ export function BasicInfoStep() {
       >
         <AppImageUploader
           onImageSelected={handleImageSelected}
-          selectedUri={values.coverImageUri ? [values.coverImageUri] : null}
+          selectedUri={
+            values.selectedCoverImageUri ? [values.selectedCoverImageUri] : null
+          }
           onRemove={handleImageRemove}
           disabled={isUploading}
-          uploading={isUploading ? { currentUploadStatus: uploadProgress } : undefined}
+          uploading={
+            isUploading ? { currentUploadStatus: uploadProgress } : undefined
+          }
         >
           <View style={styles.imagePlaceholder}>
             <AppIcon icon="Camera" size={32} color={theme.mutedForeground} />
-            <AppText variant="bodyMedium" color="muted" style={styles.imageText}>
+            <AppText
+              variant="bodyMedium"
+              color="muted"
+              style={styles.imageText}
+            >
               {t("image.description")}
             </AppText>
           </View>
@@ -103,7 +110,9 @@ export function BasicInfoStep() {
 
       {/* Brand */}
       <AppInput
-        AppInputLabel={<AppInputLabel required>{t("general.brand")}</AppInputLabel>}
+        AppInputLabel={
+          <AppInputLabel required>{t("general.brand")}</AppInputLabel>
+        }
         AppInputField={
           <AppInputField
             placeholder={t("general.brandPlaceholder")}
@@ -121,7 +130,9 @@ export function BasicInfoStep() {
 
       {/* Model */}
       <AppInput
-        AppInputLabel={<AppInputLabel required>{t("general.model")}</AppInputLabel>}
+        AppInputLabel={
+          <AppInputLabel required>{t("general.model")}</AppInputLabel>
+        }
         AppInputField={
           <AppInputField
             placeholder={t("general.modelPlaceholder")}
@@ -141,7 +152,9 @@ export function BasicInfoStep() {
       <View style={styles.row}>
         <View style={styles.halfField}>
           <AppInput
-            AppInputLabel={<AppInputLabel required>{t("identification.year")}</AppInputLabel>}
+            AppInputLabel={
+              <AppInputLabel required>{t("identification.year")}</AppInputLabel>
+            }
             AppInputField={
               <AppInputField
                 placeholder={t("identification.yearPlaceholder")}
@@ -164,12 +177,18 @@ export function BasicInfoStep() {
 
         <View style={styles.halfField}>
           <AppInput
-            AppInputLabel={<AppInputLabel required>{t("identification.plate")}</AppInputLabel>}
+            AppInputLabel={
+              <AppInputLabel required>
+                {t("identification.plate")}
+              </AppInputLabel>
+            }
             AppInputField={
               <AppInputField
                 placeholder={t("identification.platePlaceholder")}
                 value={values.plate}
-                onChangeText={(text) => setFieldValue("plate", text.toUpperCase())}
+                onChangeText={(text) =>
+                  setFieldValue("plate", text.toUpperCase())
+                }
                 autoCapitalize="characters"
               />
             }
@@ -202,7 +221,9 @@ export function BasicInfoStep() {
           <AppInputField
             placeholder={t("identification.vinPlaceholder")}
             value={values.vin ?? ""}
-            onChangeText={(text) => setFieldValue("vin", text.toUpperCase() || undefined)}
+            onChangeText={(text) =>
+              setFieldValue("vin", text.toUpperCase() || undefined)
+            }
             autoCapitalize="characters"
             maxLength={17}
           />

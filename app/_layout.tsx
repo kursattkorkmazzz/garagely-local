@@ -1,5 +1,5 @@
 import { AppLaunchingComponent } from "@/components/app-start/app-launching-component";
-import { expoDB } from "@/db/database";
+import { expoDB, initializeGaragelyDatabase } from "@/db/database";
 import { initI18n } from "@/i18n";
 import { useStore } from "@/store/store";
 import { ThemeProvider, useTheme } from "@/theme/theme-context";
@@ -44,6 +44,7 @@ export default function RootLayout() {
     async function init() {
       //await initDatabase();
       await initI18n();
+      await initializeGaragelyDatabase();
       // Cleanup orphaned pending assets on app start
       // await AssetService.cleanupPendingAssets();
       setIsReady(true);

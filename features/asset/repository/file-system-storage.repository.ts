@@ -17,7 +17,7 @@ export class FileSystemStorageRepository extends StorageRepository {
   private async ensureStorageDirectory(): Promise<void> {
     const dir = new FileSystem.Directory(this.getStorageBasePath());
     if (!dir.exists) {
-      await dir.create();
+      dir.create();
     }
   }
 
@@ -40,7 +40,7 @@ export class FileSystemStorageRepository extends StorageRepository {
     const sourceFile = new FileSystem.File(params.sourceUri);
     const destinationFile = new FileSystem.File(destinationPath);
 
-    await sourceFile.copy(destinationFile);
+    sourceFile.copy(destinationFile);
 
     if (!destinationFile.exists) {
       throw new Error("Failed to save file");

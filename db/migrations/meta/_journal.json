@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1775659409939,
-      "tag": "0000_dapper_kingpin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1775675145194,
-      "tag": "0001_loose_thunderbolt_ross",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1775675169314,
-      "tag": "0002_previous_phantom_reporter",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1775675178713,
-      "tag": "0003_nifty_darwin",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1775742328190,
-      "tag": "0004_amused_inhumans",
+      "when": 1775744924264,
+      "tag": "0000_mushy_prism",
       "breakpoints": true
     }
   ]

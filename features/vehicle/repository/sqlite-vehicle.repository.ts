@@ -11,17 +11,17 @@ import {
   PaginatedResult,
   PaginationParams,
 } from "@/features/common";
-import { CreateVehicleParams } from "./params";
 import { VehicleEntity } from "@/features/vehicle/entity/vehicle.entity";
 import { VehicleErrorCodes } from "@/utils/error/error-codes";
 import { GaragelyError } from "@/utils/error/garagely-error";
 import { asc, count, desc, eq, like, or, SQL } from "drizzle-orm";
+import { CreateVehicleParams } from "./params";
 
 import { VehicleRepository } from "./vehicle.repository";
 
 export class SqliteVehicleRepository extends VehicleRepository {
   async save(data: CreateVehicleParams): Promise<VehicleEntity> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db.transaction(async (tx) => {
       let purchasePriceId: string | null = null;
@@ -104,7 +104,7 @@ export class SqliteVehicleRepository extends VehicleRepository {
   }
 
   async findById(id: string): Promise<VehicleEntity | null> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     const result = await db
       .select()
@@ -119,8 +119,10 @@ export class SqliteVehicleRepository extends VehicleRepository {
     return this.mapToEntity(result[0]);
   }
 
-  async findAll(params?: PaginationParams): Promise<PaginatedResult<VehicleEntity>> {
-    const db = getGaragelyDatabase();
+  async findAll(
+    params?: PaginationParams,
+  ): Promise<PaginatedResult<VehicleEntity>> {
+    const db = await getGaragelyDatabase();
     const { page, limit, search, sorting } = normalizePaginationParams(params);
     const offset = calculateOffset(page, limit);
 
@@ -137,15 +139,13 @@ export class SqliteVehicleRepository extends VehicleRepository {
       );
     }
 
-    const whereClause = whereConditions.length > 0 ? whereConditions[0] : undefined;
+    const whereClause =
+      whereConditions.length > 0 ? whereConditions[0] : undefined;
 
     const orderByClause = this.buildOrderByClause(sorting);
 
     const [totalResult, dataResult] = await Promise.all([
-      db
-        .select({ count: count() })
-        .from(VehicleSchema)
-        .where(whereClause),
+      db.select({ count: count() }).from(VehicleSchema).where(whereClause),
       db
         .select()
         .from(VehicleSchema)
@@ -162,7 +162,7 @@ export class SqliteVehicleRepository extends VehicleRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const db = getGaragelyDatabase();
+    const db = await getGaragelyDatabase();
 
     await db.delete(VehicleSchema).where(eq(VehicleSchema.id, id));
   }
@@ -179,7 +179,8 @@ export class SqliteVehicleRepository extends VehicleRepository {
       coverImageId: row.coverImageId,
       fuelType: row.fuelType as VehicleEntity["fuelType"],
       bodyType: row.bodyType as VehicleEntity["bodyType"],
-      transmissionType: row.transmissionType as VehicleEntity["transmissionType"],
+      transmissionType:
+        row.transmissionType as VehicleEntity["transmissionType"],
       purchaseDateId: row.purchaseDateId,
       purchasePriceId: row.purchasePriceId,
       purchaseOdometerId: row.purchaseOdometerId,
@@ -211,7 +212,10 @@ export class SqliteVehicleRepository extends VehicleRepository {
     type ColumnKey = keyof typeof columnMap;
 
     return sorting
-      .filter((sort): sort is typeof sort & { sortBy: ColumnKey } => sort.sortBy in columnMap)
+      .filter(
+        (sort): sort is typeof sort & { sortBy: ColumnKey } =>
+          sort.sortBy in columnMap,
+      )
       .map((sort) => {
         const column = columnMap[sort.sortBy];
         return sort.sortOrder === "asc" ? asc(column) : desc(column);
