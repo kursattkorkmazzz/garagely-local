@@ -100,14 +100,35 @@ export function useCreateVehicle() {
 }
 ```
 
+### Asset Lifecycle — PENDING / CONFIRMED
+
+Assets (images, files) are uploaded immediately when selected in a form, before the parent entity is saved. This creates a two-phase lifecycle managed via the `asset_references` table.
+
+**States:** `PENDING` → uploaded, waiting to be linked | `CONFIRMED` → linked to a persisted entity
+
+**`db/schemas/asset-reference.schema.ts`** — tracks which entity owns which asset:
+```
+asset_references(id, assetId, ownerType, ownerId)
+  e.g. (uuid, "abc123", "vehicle", "veh456")
+```
+
+**How it works:**
+- Upload → `AssetService.saveAsset()` → status=PENDING, no reference row yet
+- Entity save (e.g. vehicle) → repository transaction inserts into `asset_references` AND sets status=CONFIRMED, atomically
+- Entity delete → repository deletes from `asset_references`, then service deletes the file + asset record
+- Startup cleanup → `AssetService.cleanupPendingAssets()` deletes PENDING assets NOT present in `asset_references` via SQL subquery — **no ID list in memory, scales to any number of features**
+
+**Adding a new feature that uses assets:** just insert/delete rows in `asset_references` with your feature's `ownerType`. The cleanup query handles it automatically.
+
 ### Feature Isolation Rules
 
 | Allowed | Not Allowed |
 |---|---|
-| Feature imports from `features/common` | Repository imports another feature's service |
+| Feature imports from `features/common` | Repository imports another feature's **service** |
 | Service calls another feature's service | Screen calls a service directly |
-| Hook calls its own feature's service | Service instantiates `new ConcreteRepository()` |
-| `constants/` exports enums | `constants/` exports Zod validators |
+| Repository imports DB schemas from other features | Service instantiates `new ConcreteRepository()` |
+| Hook calls its own feature's service | `constants/` exports Zod validators |
+| `constants/` exports enums | — |
 
 ### `constants/` vs `features/common/dto/`
 

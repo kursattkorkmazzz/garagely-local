@@ -205,38 +205,181 @@ Move concrete repository files into `local/` subfolder:
 
 ---
 
-## Phase 4 — Fix Cross-Feature Dependency
+## Phase 4 — Asset Feature Refactor (Lifecycle + Orphan Prevention)
 
-**Goal:** Remove `AssetService` from `SqliteVehicleRepository`. Repositories must not call other feature services.
+**Goal:** Fix the architecture violation, prevent file leaks, and make cleanup scale with no application-level coordination.
 
-### Changes to `features/vehicle/repository/local/sqlite-vehicle.repository.ts`
-- Remove `import { AssetService }` 
-- Remove the asset existence check (lines that call `AssetService.assetExists`)
-- Remove the asset confirmation call (lines that call `AssetService.confirmAsset`)
+### 4.1 New DB schema: `db/schemas/asset-reference.schema.ts`
 
-### Changes to `features/vehicle/service/vehicle.service.ts`
-Move the asset lifecycle management here, wrapping the repository save:
+```typescript
+import { BaseSchema } from "@/db/helpers/base.schema";
+import { sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+
+export const AssetReferenceSchema = sqliteTable(
+  "asset_references",
+  {
+    ...BaseSchema,
+    assetId: text().notNull(),
+    ownerType: text().notNull(),  // e.g. "vehicle"
+    ownerId: text().notNull(),
+  },
+  (t) => [unique().on(t.assetId, t.ownerType, t.ownerId)],
+);
+```
+
+After creating this file run: `npx drizzle-kit generate`
+
+### 4.2 `features/asset/constants/asset-status.ts` (dir rename: contants → constants)
+
+Reduce cleanup threshold: `PENDING_ASSET_CLEANUP_THRESHOLD_HOURS = 1` (was 24)
+
+### 4.3 `features/asset/repository/asset.repository.ts`
+
+Replace `deletePendingOlderThan` with `findPendingUnreferenced` — repository finds candidates, service handles file + record deletion:
+
+```typescript
+// REMOVE: abstract deletePendingOlderThan(thresholdDate: Date): Promise<number>;
+// ADD:
+abstract findPendingUnreferenced(thresholdDate: Date): Promise<AssetEntity[]>;
+```
+
+### 4.4 `features/asset/repository/local/sqlite-asset.repository.ts`
+
+Implement `findPendingUnreferenced` — SQL subquery, no external ID list needed:
+
+```typescript
+async findPendingUnreferenced(thresholdDate: Date): Promise<AssetEntity[]> {
+  const db = getGaragelyDatabase(); // no await — it's synchronous
+  const referencedSubquery = db
+    .select({ id: AssetReferenceSchema.assetId })
+    .from(AssetReferenceSchema);
+
+  const result = await db
+    .select()
+    .from(AssetSchema)
+    .where(
+      and(
+        eq(AssetSchema.status, AssetStatus.PENDING),
+        lt(AssetSchema.created_at, thresholdDate),
+        notInArray(AssetSchema.id, referencedSubquery),
+      ),
+    );
+  return result.map(this.mapToEntity);
+}
+```
+
+Also remove `await` from all `getGaragelyDatabase()` calls in this file.
+
+### 4.5 `features/asset/service/asset.service.ts`
+
+Fix `cleanupPendingAssets` to also delete physical files (currently only removes DB records):
+
+```typescript
+static async cleanupPendingAssets(options?: { olderThanHours?: number }): Promise<number> {
+  const thresholdHours = options?.olderThanHours ?? PENDING_ASSET_CLEANUP_THRESHOLD_HOURS;
+  const thresholdDate = new Date(Date.now() - thresholdHours * 60 * 60 * 1000);
+
+  const assets = await this.assetRepository.findPendingUnreferenced(thresholdDate);
+
+  for (const asset of assets) {
+    try {
+      await this.storageRepository.deleteFile(asset.path); // ← was missing!
+      await this.assetRepository.delete(asset.id);
+    } catch {
+      // Continue — one failure should not stop full cleanup
+    }
+  }
+  return assets.length;
+}
+```
+
+### 4.6 `features/vehicle/repository/local/sqlite-vehicle.repository.ts`
+
+**a. Remove `AssetService` import and all calls** (the architecture violation fix).
+
+**b. In `save()` transaction** — add atomic asset reference + confirmation at the end:
+
+```typescript
+// After vehicle insert, still inside db.transaction():
+if (data.coverImageId) {
+  await tx.insert(AssetReferenceSchema).values({
+    assetId: data.coverImageId,
+    ownerType: "vehicle",
+    ownerId: vehicleResult[0].id,
+  });
+  await tx.update(AssetSchema)
+    .set({ status: "confirmed" })
+    .where(eq(AssetSchema.id, data.coverImageId));
+}
+```
+
+Note: importing `AssetReferenceSchema` and `AssetSchema` here is **allowed** — repositories may import DB schemas from other features. They must not import services from other features.
+
+**c. In `delete()`** — remove the reference row before deleting the vehicle:
+
+```typescript
+async delete(id: string): Promise<void> {
+  const db = getGaragelyDatabase();
+  const vehicle = await this.findById(id);
+  await db.transaction(async (tx) => {
+    if (vehicle?.coverImageId) {
+      await tx.delete(AssetReferenceSchema)
+        .where(eq(AssetReferenceSchema.ownerId, id));
+    }
+    await tx.delete(VehicleSchema).where(eq(VehicleSchema.id, id));
+  });
+}
+```
+
+### 4.7 `features/vehicle/service/vehicle.service.ts`
+
+**a. `addVehicle`** — validate asset before save; no separate `confirmAsset` call needed (repo handles it atomically):
 
 ```typescript
 static async addVehicle(data: CreateVehicleDto): Promise<VehicleEntity> {
   const validated = CreateVehicleDtoValidator.parse(data);
-  const repo = getVehicleRepository();
 
-  // Validate cover image exists before writing anything
   if (validated.coverImageId) {
     const exists = await AssetService.assetExists(validated.coverImageId);
     if (!exists) throw new GaragelyError(VehicleErrorCodes.COVER_IMAGE_NOT_FOUND);
   }
 
-  const vehicle = await repo.save(validated);
-
-  // Confirm asset now that vehicle is persisted
-  if (validated.coverImageId) {
-    await AssetService.confirmAsset(validated.coverImageId);
-  }
-
-  return vehicle;
+  const repo = getVehicleRepository();
+  return repo.save(validated); // reference + confirm happen inside the transaction
 }
+```
+
+**b. `deleteVehicle`** — delete the physical file + asset record after the vehicle is removed:
+
+```typescript
+static async deleteVehicle(id: string): Promise<void> {
+  const repo = getVehicleRepository();
+  const vehicle = await repo.findById(id);
+  await repo.delete(id); // also removes asset_references row in transaction
+
+  if (vehicle?.coverImageId) {
+    await AssetService.deleteAsset(vehicle.coverImageId);
+  }
+}
+```
+
+### 4.8 `app/_layout.tsx` — startup cleanup
+
+After database initialization:
+
+```typescript
+await AssetService.cleanupPendingAssets();
+// No arguments — the SQL subquery handles exclusions internally
+```
+
+### 4.9 `components/vehicle/forms/steps/basic-info-step.tsx` — image preview fix
+
+In `handleImageSelected`, after `AssetService.saveAsset()`:
+
+```typescript
+const savedAsset = await AssetService.saveAsset(createAssetDto);
+setFieldValue("coverImageId", savedAsset.id);
+setFieldValue("selectedCoverImageUri", asset.uri); // ← was missing; fixes preview
 ```
 
 ---
@@ -410,13 +553,13 @@ When a real API is available, follow these steps per feature:
 | Phase | Description | Status |
 |---|---|---|
 | 0 | Architecture documentation | ✅ Done |
-| 1 | Structural cleanup | ⬜ Pending |
-| 2 | Complete `features/common` | ⬜ Pending |
-| 3 | Repository registry | ⬜ Pending |
-| 4 | Fix cross-feature dependency | ⬜ Pending |
-| 5 | Fix unnecessary `await` | ⬜ Pending |
-| 6 | Hooks layer | ⬜ Pending |
-| 7 | Wire UI to hooks | ⬜ Pending |
-| 8 | Form validation | ⬜ Pending |
+| 1 | Structural cleanup (typo, DTO locations, enum fix) | ⬜ Pending |
+| 2 | Complete `features/common` (VolumeEntity + repo) | ⬜ Pending |
+| 3 | Repository registry + move concrete files to `local/` | ⬜ Pending |
+| 4 | Asset lifecycle refactor (references table, file cleanup fix, arch violation fix) | ⬜ Pending |
+| 5 | Fix unnecessary `await` on `getGaragelyDatabase()` | ⬜ Pending |
+| 6 | Hooks layer per feature | ⬜ Pending |
+| 7 | Wire UI to hooks (replace mock data, fix image preview) | ⬜ Pending |
+| 8 | Form validation (Zod → Formik) | ⬜ Pending |
 | 9 | i18n completeness | ⬜ Pending |
 | 10 | Remote backend migration | 🔮 Future |
