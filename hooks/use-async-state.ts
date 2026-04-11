@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useState } from "react";
 
 export type AsyncState<TData = void, TError = Error> =
   | { status: "idle" }
@@ -8,10 +8,7 @@ export type AsyncState<TData = void, TError = Error> =
 
 export type UseAsyncStateReturn<TData, TError> = {
   state: AsyncState<TData, TError>;
-  setIdle: () => void;
-  setLoading: () => void;
-  setSuccess: (data: TData) => void;
-  setError: (error: TError) => void;
+  setState: Dispatch<SetStateAction<AsyncState<TData, TError>>>;
   isIdle: boolean;
   isLoading: boolean;
   isSuccess: boolean;
@@ -23,12 +20,17 @@ export type UseAsyncStateReturn<TData, TError> = {
  * Manages async operation state with a single discriminated union.
  *
  * @example
- * const { state, run, isLoading } = useAsyncState<Vehicle>();
+ * const { state, setState, run, isLoading } = useAsyncState<Vehicle>();
  *
+ * // Manual state control:
+ * setState({ status: 'loading' });
+ * setState({ status: 'success', data: vehicle });
+ * setState({ status: 'error', error: new Error('oops') });
+ * setState({ status: 'idle' });
+ *
+ * // Automatic state management via run():
  * await run(() => VehicleService.addVehicle(dto));
- *
  * if (state.status === 'success') console.log(state.data); // typed as Vehicle
- * if (state.status === 'error')   console.log(state.error);
  */
 export function useAsyncState<
   TData = void,
@@ -37,17 +39,6 @@ export function useAsyncState<
   const [state, setState] = useState<AsyncState<TData, TError>>({
     status: "idle",
   });
-
-  const setIdle = useCallback(() => setState({ status: "idle" }), []);
-  const setLoading = useCallback(() => setState({ status: "loading" }), []);
-  const setSuccess = useCallback(
-    (data: TData) => setState({ status: "success", data }),
-    [],
-  );
-  const setError = useCallback(
-    (error: TError) => setState({ status: "error", error }),
-    [],
-  );
 
   const run = useCallback(async (fn: () => Promise<TData>): Promise<void> => {
     setState({ status: "loading" });
@@ -62,10 +53,7 @@ export function useAsyncState<
 
   return {
     state,
-    setIdle,
-    setLoading,
-    setSuccess,
-    setError,
+    setState,
     isIdle: state.status === "idle",
     isLoading: state.status === "loading",
     isSuccess: state.status === "success",

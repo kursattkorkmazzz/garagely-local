@@ -1,134 +1,38 @@
-import { GaragelyError } from "@/utils/error/garagely-error";
-import Toast from "react-native-toast-message";
-import { ZodError } from "zod";
-
-// ---------------------------------------------------------------------------
-// Action types
-// ---------------------------------------------------------------------------
-
-export type ToastAction = {
-  kind: "toast";
-  /** Defaults to 'error'. */
-  severity?: "error" | "warning" | "info";
-  /** Override message. Falls back to the error's own message if omitted. */
-  message?: string;
-};
-
-export type FieldAction = {
-  kind: "field";
-  /**
-   * Formik field name to attach the error to.
-   * If omitted and the source is a ZodError, the field path is used automatically.
-   */
-  fieldName?: string;
-  /** Override message. Falls back to the error's own message if omitted. */
-  message?: string;
-};
-
-export type IgnoreAction = {
-  kind: "ignore";
-};
-
-export type ErrorAction = ToastAction | FieldAction | IgnoreAction;
+import { useCallback } from "react";
 
 /**
- * A rule is either a single action or an array of actions.
- * Use an array when the same error should trigger multiple actions,
- * e.g. both set a field error AND show a toast.
+ * A single case in the error handler.
+ *
+ * `match` is a type guard — return true if this case should handle the error.
+ * `handler` receives the narrowed error type.
  */
-export type ErrorRule = ErrorAction | ErrorAction[];
-
-// ---------------------------------------------------------------------------
-// Config & Formik types
-// ---------------------------------------------------------------------------
-
-/** Minimal Formik interface needed for 'field' actions. */
-export type FormikLike = {
-  setFieldError: (field: string, message: string) => void;
+export type ErrorCase<E = unknown> = {
+  match: (error: unknown) => error is E;
+  handler: (error: E) => void;
 };
 
 /**
- * Maps error keys to rules.
+ * Returns a handler function that routes errors to the first matching case.
  *
- * Keys can be:
- * - A Zod field path (e.g. `'brand'`, `'purchasePrice.amount'`)
- * - A Zod issue code (e.g. `'too_small'`, `'invalid_type'`)
- * - A GaragelyError code (e.g. `'VEHICLE_COVER_IMAGE_NOT_FOUND'`)
- * - `_default` — matches any error that no other rule covers
- */
-export type ErrorHandlerConfig = {
-  [key: string]: ErrorRule;
-  _default?: ErrorRule;
-};
-
-// ---------------------------------------------------------------------------
-// Internal helper
-// ---------------------------------------------------------------------------
-
-function executeRule(
-  rule: ErrorRule,
-  context: { message?: string; fieldName?: string },
-  formik?: FormikLike,
-): void {
-  const actions = Array.isArray(rule) ? rule : [rule];
-  for (const action of actions) {
-    switch (action.kind) {
-      case "toast":
-        Toast.show({
-          type: action.severity ?? "error",
-          text1: action.message ?? context.message,
-        });
-        break;
-
-      case "field": {
-        const field = action.fieldName ?? context.fieldName;
-        const msg = action.message ?? context.message;
-        if (field && msg && formik) {
-          formik.setFieldError(field, msg);
-        }
-        break;
-      }
-
-      case "ignore":
-        break;
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
-
-/**
- * Returns a handler function that processes errors according to `config`.
+ * Cases are evaluated in order — the first match wins and the rest are skipped.
+ * If no case matches, `fallback` is called (if provided).
  *
- * Matching priority per error type:
- *
- * **ZodError** (each issue is processed independently):
- *   1. config[issue.path.join('.')]   — field path (e.g. 'brand')
- *   2. config[issue.code]             — Zod issue code (e.g. 'too_small')
- *   3. config._default
- *
- * **GaragelyError**:
- *   1. config[error.code]             — e.g. 'VEHICLE_COVER_IMAGE_NOT_FOUND'
- *   2. config._default
- *
- * **Any other Error**:
- *   1. config._default
- *
- * @param config  Rules map. Provide as a stable object (useMemo or module-level constant).
- * @param formik  Optional Formik helpers — required when any rule uses `{ kind: 'field' }`.
+ * @param cases   Ordered list of `{ match, handler }` pairs.
+ * @param fallback  Called when no case matches. Receives the raw unknown error.
  *
  * @example
- * const { setFieldError } = useVehicleForm();
  * const handleError = useErrorHandler(
- *   {
- *     brand:  { kind: 'field' },
- *     model:  { kind: 'field' },
- *     VEHICLE_COVER_IMAGE_NOT_FOUND: { kind: 'toast', message: t('errors.imageNotFound') },
- *     _default: { kind: 'toast' },
- *   },
- *   { setFieldError },
+ *   [
+ *     {
+ *       match: (e): e is ZodError => e instanceof ZodError,
+ *       handler: (e) => e.issues.forEach(issue => formik.setFieldError(issue.path.join('.'), issue.message)),
+ *     },
+ *     {
+ *       match: (e): e is GaragelyError => e instanceof GaragelyError,
+ *       handler: (e) => Toast.show({ type: 'error', text1: t(`errors.${e.code}`) }),
+ *     },
+ *   ],
+ *   (e) => Toast.show({ type: 'error', text1: t('errors.unknown') }),
  * );
  *
  * try {
@@ -138,40 +42,20 @@ function executeRule(
  * }
  */
 export function useErrorHandler(
-  config: ErrorHandlerConfig,
-  formik?: FormikLike,
+  cases: ErrorCase<any>[],
+  fallback?: (error: unknown) => void,
 ): (error: unknown) => void {
-  return (error: unknown): void => {
-    // --- ZodError: each issue is matched independently ---
-    if (error instanceof ZodError) {
-      for (const issue of error.issues) {
-        const path = issue.path.join(".");
-        const rule =
-          (path && config[path]) ?? config[issue.code] ?? config._default;
-        if (rule) {
-          executeRule(rule, { message: issue.message, fieldName: path }, formik);
+  return useCallback(
+    (error: unknown): void => {
+      for (const c of cases) {
+        if (c.match(error)) {
+          c.handler(error);
+          return;
         }
       }
-      return;
-    }
-
-    // --- GaragelyError: match by error.code ---
-    if (error instanceof GaragelyError) {
-      const rule = config[error.code] ?? config._default;
-      if (rule) {
-        executeRule(rule, { message: error.message }, formik);
-      }
-      return;
-    }
-
-    // --- Generic Error ---
-    const rule = config._default;
-    if (rule) {
-      executeRule(
-        rule,
-        { message: error instanceof Error ? error.message : String(error) },
-        formik,
-      );
-    }
-  };
+      fallback?.(error);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [cases, fallback],
+  );
 }
